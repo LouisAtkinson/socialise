@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -10,6 +11,9 @@ function Register() {
   });
 
   const { firstName, lastName, email, password } = formData;
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const { dispatch } = useAuthContext();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -19,8 +23,37 @@ function Register() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/user/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const json = await response.json();
+       
+      if (response.ok) {
+        setLoading(false);
+        localStorage.setItem('user', JSON.stringify(json));
+        dispatch({type: 'LOGIN', payload: json});
+        console.log(json);
+        window.location.href = '/';
+      } else {
+        setLoading(false);
+        setError(json.error);
+        console.error(error);
+      }
+    } catch (error) {
+      console.error('Error during registration:', error);
+    }
   };
 
   return (
@@ -83,9 +116,14 @@ function Register() {
             required
           />
         </div>
-        <button type="submit" className="register-button">
+        <button 
+          type="submit" 
+          className="register-button"
+          disabled={loading}
+        >
           Register
         </button>
+        {error && <div className='error'>{error}</div>}
       </form>
       <p className="register-login-text">
         Already have an account? <Link to="/login">Login</Link>

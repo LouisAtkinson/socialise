@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 function Login() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const { dispatch } = useAuthContext();
 
   const { email, password } = formData;
 
@@ -17,8 +22,40 @@ function Login() {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setLoading(true);
+    setError(null);
+  
+    try {
+      console.log("Before fetch:", formData);
+  
+      const response = await fetch('/api/user/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+  
+      console.log("After fetch:", response);
+  
+      const json = await response.json();
+  
+      if (response.ok) {
+        setLoading(false);
+        localStorage.setItem('user', JSON.stringify(json));
+        dispatch({type: 'LOGIN', payload: json});
+        console.log(json);
+        window.location.href = '/';
+      } else {
+        setLoading(false);
+        setError(json.error);
+        console.error(error);
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+    }
   };
 
   return (
@@ -56,6 +93,7 @@ function Login() {
         <button type="submit" className="login-button">
           Login
         </button>
+        {error && <div className='error'>{error}</div>}
       </form>
       <p className="login-register-text">
         Don't have an account? <Link to="/register">Register</Link>

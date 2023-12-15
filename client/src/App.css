@@ -19,14 +19,14 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.header a {
+.header a, .notifications-link {
   text-decoration: none;
   color: #ffffff;
   margin-right: 20px;
   transition: color 0.3s ease;
 }
 
-.header a:hover {
+.header a:hover, .notifications-link:hover {
   color: #f2f2f2;
 }
 
@@ -375,4 +375,143 @@ textarea {
 
 .register-form {
   width: 300px;
+}
+
+/* Add this CSS to your stylesheet */
+
+.notifications-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.notifications-link {
+  cursor: pointer;
+}
+
+.notification-count {
+  background-color: #007bff;
+  color: #fff;
+  border-radius: 50%;
+  padding: 4px 8px;
+  margin-left: 4px;
+  font-size: 14px;
+}
+
+.notifications-menu {
+  position: absolute;
+  top: 100%; /* Position menu below the link */
+  right: 0;
+  width: 250px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.notifications-menu h3 {
+  padding: 10px;
+  margin: 0;
+  background-color: #007bff; /* Header background color */
+  color: #fff; /* Header text color */
+  font-size: 16px;
+}
+
+.notifications-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notifications-menu li {
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.notifications-menu li:last-child {
+  border-bottom: none;
+}
+
+.notification-timestamp,
+.notifications-menu p {
+  color: #333;
+}
+
+.notifications-menu strong {
+  color: #007bff;
+}
+
+.edit-profile-button, .save-changes-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.edit-profile-button:hover, .save-changes-btn:hover {
+  background-color:#0055ff;
+}
+
+.edit-profile-container {
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.profile-picture-section {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.profile-picture-section img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.edit-profile-container label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.edit-profile-container input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 5px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label input {
+  margin-right: 5px;
+}
+
+.save-changes-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.save-changes-btn:hover {
+  background-color: #0055ff;
 }

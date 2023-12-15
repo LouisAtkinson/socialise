@@ -1,23 +1,23 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var session = require('express-session');
-var passport = require('passport');
-var LocalStrategy = require('passport-local').Strategy;
-var User = require('./models/user'); // Replace with your user model
+const express = require('express');
+const path = require('path');
+const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const User = require('./models/user'); 
+const db = require('./db');
+const bodyParser = require('body-parser');
+const morgan = require('morgan')
+require('dotenv').config();
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+const app = express();
+const cors = require('cors');
 
-var app = express();
+app.use(morgan('combined'));
+app.use(bodyParser.json());
+app.use(cors());
 
-// ... (other middleware and setup code)
-
-// Configure Express session
 app.use(session({
-  secret: 'your-secret-key', // Replace with your own secret key
+  secret: process.env.SECRET, 
   resave: false,
   saveUninitialized: false
 }));
@@ -25,16 +25,14 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-passport.use(new LocalStrategy(
-  function(username, password, done) {
-    User.findOne({ username: username }, function(err, user) {
-      if (err) { return done(err); }
-      if (!user) { return done(null, false); }
-      if (!user.validatePassword(password)) { return done(null, false); }
-      return done(null, user);
-    });
-  }
-));
+passport.use(new LocalStrategy(function(username, password, done) {
+  User.findOne({ username: username }, function(err, user) {
+    if (err) { return done(err); }
+    if (!user) { return done(null, false); }
+    if (!user.validatePassword(password)) { return done(null, false); }
+    return done(null, user);
+  });
+}));
 
 passport.serializeUser(function(user, done) {
   done(null, user.id);
@@ -46,15 +44,28 @@ passport.deserializeUser(function(id, done) {
   });
 });
 
-app.get('/dashboard', passport.authenticate('local', {
-  successRedirect: '/dashboard',
-  failureRedirect: '/login',
-  failureFlash: true
-}), function(req, res) {
-  // This code will execute if authentication is successful
-  res.render('dashboard', { user: req.user });
+const userRouter = require('./routes/users');
+app.use("/api/user", userRouter);
+
+const postRouter = require('./routes/posts');
+app.use('/api/posts', postRouter);
+
+const friendRouter = require('./routes/friendRoutes');
+app.use('/api/friends', friendRouter);
+
+const displayPictureRoutes = require('./routes/displayPictureRoutes');
+app.use('/display-pictures', displayPictureRoutes);
+
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+app.get('*', (req, res) => {                       
+  res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));                               
 });
 
-// ... (other routes and error handling)
+const port = process.env.PORT || 4000;
+
+app.listen(port, () => {
+  console.log(`Server is running on port ${port}`);
+});
 
 module.exports = app;
