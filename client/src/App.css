@@ -161,7 +161,11 @@ body {
   gap: 20px;
 }
 
-.friend img {
+.user-friend a {
+  text-decoration: none;
+}
+
+.user-friend img {
   width: 80px;
   height: 80px;
   object-fit: cover;
@@ -200,7 +204,7 @@ body {
 }
 
 .post-form button:hover {
-  background-color: #0055ff; /* Change background color on hover to a darker shade of blue */
+  background-color: #0055ff;
 }
 
 .post {
@@ -225,9 +229,21 @@ body {
   margin-right: 10px;
 }
 
-.post-info p {
+.post-info p, .comment-info p {
   margin: 0;
-  font-weight: bold;
+}
+
+.post-info a, .comment-info a {
+  text-decoration: none;
+}
+
+.post-author, .comment-author {
+  font-weight: 700;
+}
+
+.comment-name-date {
+  display: flex;
+  gap: 10px;
 }
 
 .delete-post {
@@ -314,11 +330,6 @@ textarea {
   height: 30px;
   border-radius: 50%;
   margin-right: 10px;
-}
-
-.comment-info p {
-  margin: 0;
-  font-weight: bold;
 }
 
 .delete-comment {
@@ -443,7 +454,7 @@ textarea {
 
 .notifications-menu {
   position: absolute;
-  top: 100%; /* Position menu below the link */
+  top: 100%; 
   right: 0;
   width: 250px;
   background-color: #fff;
@@ -455,8 +466,8 @@ textarea {
 .notifications-menu h3 {
   padding: 10px;
   margin: 0;
-  background-color: #007bff; /* Header background color */
-  color: #fff; /* Header text color */
+  background-color: #007bff;
+  color: #fff; 
   font-size: 16px;
 }
 

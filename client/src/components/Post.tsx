@@ -5,6 +5,7 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
 import { CommentData, Like, PostProps } from '../types/types';
 import { Link } from 'react-router-dom';
+import { formatDate } from '../helpers/helpers';
 
 function Post({ _id, content, author, date, likes, comments, update }: PostProps) {  
   const { user } = useAuthContext();
@@ -121,13 +122,17 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
   return (
     <div className="post">
       <div className="post-header">
-        <img
-          src={author.profilePicture ? URL.createObjectURL(author.profilePicture) : blankImage}
-          alt={`${author.firstName}'s profile`}
-        />        
+        <Link to={`/user/${author._id}`}>
+          <img
+            src={author.profilePicture ? URL.createObjectURL(author.profilePicture) : blankImage}
+            alt={`${author.firstName}'s display picture`}
+          />
+        </Link>
         <div className="post-info">
-          <p>{`${author.firstName} ${author.lastName}`}</p>
-          <p>{date}</p>
+          <Link to={`/user/${author._id}`}>
+            <p className='post-author'>{`${author.firstName} ${author.lastName}`}</p>
+          </Link>          
+          <p>{formatDate(date)}</p>
         </div>
         <button className="delete-post" onClick={handleDeleteClick}>
           Delete

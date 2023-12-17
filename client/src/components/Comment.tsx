@@ -3,6 +3,8 @@ import blankImage from '../images/blank.png';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
 import { CommentProps } from '../types/types';
+import { formatDate } from '../helpers/helpers';
+import { Link } from 'react-router-dom';
 
 function Comment({ _id, profilePicture, fullName, datetime, content, postId, update }: CommentProps) {
   const { user } = useAuthContext();
@@ -36,15 +38,24 @@ function Comment({ _id, profilePicture, fullName, datetime, content, postId, upd
   
   return (
     <div className="comment">
-      <img src={profilePicture ? URL.createObjectURL(profilePicture) : blankImage} alt={`${fullName}'s profile`} />
+      <Link to={`/user/${_id}`}>
+        <img
+          src={profilePicture ? URL.createObjectURL(profilePicture) : blankImage}
+          alt={`${fullName}'s display picture`}
+        />
+      </Link>
       <div className="comment-info">
-        <p>{fullName}</p>
-        <p>{datetime}</p>
+        <div className='comment-name-date'>
+          <Link to={`/user/${_id}`}>
+            <p className='comment-author'>{fullName}</p>
+          </Link>
+          <p>{formatDate(datetime)}</p>
+        </div>
+        <p className="comment-content">{content}</p>          
       </div>
       <button className="delete-comment" onClick={handleDeleteClick}>
         Delete
       </button>
-      <p className="comment-content">{content}</p>
     </div>
   );
 }

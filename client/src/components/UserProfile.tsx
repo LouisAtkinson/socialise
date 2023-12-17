@@ -30,12 +30,7 @@ function UserProfile() {
 
   const [loading, setLoading] = useState<boolean>(true);
   const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null);
-
-  const [friendsList, setFriendsList] = useState([
-    { id: 1, name: 'Friend 1', profilePicture: 'friend1.jpg' },
-    { id: 2, name: 'Friend 2', profilePicture: 'friend2.jpg' },
-  ]);
-
+  const [friendsList, setFriendsList] = useState([]);
   const [newPost, setNewPost] = useState('');
 
   const handlePostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -191,7 +186,6 @@ function UserProfile() {
   };
 
   useEffect(() => {
-    console.log('Use effect triggered:', id)
     checkFriendshipStatus();
   }, [id]);
 
@@ -303,8 +297,38 @@ function UserProfile() {
     }
   };
 
+  const fetchFriendsList = async () => {
+    try {
+      const token = user?.token;
+
+      if (!token) {
+        logout();
+        return;
+      }
+
+      const response = await fetch(`/api/friends/all/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFriendsList(data);
+      } else {
+        console.error('Error fetching friends list:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error fetching friends list:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFriendsList();
+  }, [id]);
+
   if (loading) {
-    return <h3>Loading...</h3>
+    return <h3>Loading...</h3>;
   }
 
   return (
@@ -327,12 +351,21 @@ function UserProfile() {
       <div className="friends-section">
         <h3>Friends</h3>
         <div className="friends-list">
-          {friendsList.map((friend) => (
-            <div key={friend.id} className="friend">
-              <img src={friend.profilePicture} alt={`${friend.name}'s profile`} />
-              <p>{friend.name}</p>
-            </div>
-          ))}
+          {friendsList.length === 0 ? (
+            <p>No friends added yet.</p>
+          ) : (
+            friendsList.slice(0, 2).map((friend: { _id: number; profilePicture: File | null; firstName: string; lastName: string; }) => (             
+              <div key={friend._id} className="user-friend">
+                <Link to={`/user/${friend._id}`}>
+                  <img
+                    src={friend.profilePicture ? URL.createObjectURL(friend.profilePicture) : blankImage}
+                    alt={`${friend.firstName}'s profile`}
+                  />
+                  <p>{`${friend.firstName} ${friend.lastName}`}</p>
+                </Link>
+              </div>
+            ))
+          )}
         </div>
         <Link to="friends">See All Friends</Link>
       </div>

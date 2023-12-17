@@ -13,8 +13,10 @@ const getAllFriends = async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const friends = await User.find({ _id: { $in: loggedInUser.friends } }).select('firstName lastName');
-
+    const friends = await User.find({ _id: { $in: loggedInUser.friends } })
+      .select('firstName lastName displayPicture') 
+      .populate('displayPicture', 'filename'); 
+    
     res.json(friends);
   } catch (error) {
     console.error('Error getting all friends:', error);
