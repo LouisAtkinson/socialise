@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
-
-interface PostFormProps {
-  onSubmit: (postContent: string) => void;
-}
+import { PostFormProps } from '../types/types';
 
 function PostForm({ onSubmit }: PostFormProps) {
   const [newPost, setNewPost] = useState('');

@@ -33,6 +33,28 @@ const logIn = async (req, res) => {
   }
 }
 
+const searchUsers = async (req, res) => {
+  try {
+    const { query } = req.params;
+    const regex = new RegExp(`^${query}`, 'i');
+
+    const users = await User.find(
+      {
+        $or: [
+          { firstName: { $regex: regex } },
+          { lastName: { $regex: regex } },
+        ],
+      },
+      'id firstName lastName hometown visibility'
+    );
+
+    res.status(200).json(users);
+  } catch (error) {
+    console.error('Error searching users:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 const getUserProfile = async (req, res) => {
   const userId = req.params.id;
 
@@ -106,4 +128,4 @@ const updateDisplayPicture = async (userId, displayPictureId) => {
   }
 };
 
-module.exports = { register, logIn, getUserProfile, updateUserProfile, updateDisplayPicture };
+module.exports = { register, logIn, getUserProfile, updateUserProfile, updateDisplayPicture, searchUsers };

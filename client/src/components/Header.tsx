@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Notifications from './Notifications';
 import { useLogout } from '../hooks/useLogout';
 import { useAuthContext } from '../hooks/useAuthContext';
+import SearchBar from './SearchBar';
 
 function Header() {
   const { user } = useAuthContext();
@@ -16,6 +17,7 @@ function Header() {
       <nav>
         {user ? (
           <>
+            <SearchBar />
             <Link to="/">Home</Link>
             <Notifications/>
             <Link to={`/user/${user.id}`}>My Profile</Link>

@@ -11,6 +11,7 @@ import DisplayPicture from './components/DisplayPicture';
 import EditProfile from './components/EditProfile';
 import Login from './components/Login';
 import Register from './components/Register';
+import SearchPage from './components/SearchPage';
 
 function App() {
   const { user } = useAuthContext();
@@ -29,7 +30,6 @@ function App() {
               path="/register" 
               element={user ? <Navigate to='/' /> : <Register />} 
             />
-            {/* Protect the following routes for authenticated users */}
             <Route
               path="/user/:id"
               element={user ? <UserProfile /> : <Navigate to='/login' />}
@@ -45,6 +45,10 @@ function App() {
                   user={user}
                 /> : <Navigate to='/login' />}
               />
+            <Route
+              path="/search"
+              element={user ? <SearchPage /> : <Navigate to='/login' />}
+            />
             <Route
               path="/"
               element={user ? <Home /> : <Navigate to='/login' />}

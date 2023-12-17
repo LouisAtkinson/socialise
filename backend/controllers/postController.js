@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 
 const getAllPosts = async (req, res) => {
   try {
-    console.log('Request received:', req);
     const userId = req.params.userId;
 
     const user = await User.findById(userId);

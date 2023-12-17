@@ -1,38 +1,7 @@
 import React, { useState, ChangeEvent, FormEvent, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
 import blankImage from '../images/blank.png';
-
-interface EditProfileProps {
-  user: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    dateOfBirth: Date | null;
-    hometown: string;
-    occupation: string;
-    profilePicture: File;
-    visibility: {
-      dateOfBirth: boolean;
-      hometown: boolean;
-      occupation: boolean;
-    };
-  };
-}
-
-interface PrivateInfo {
-  dateOfBirth: boolean;
-  hometown: boolean;
-  occupation: boolean;
-}
-
-interface FormState {
-  dateOfBirth: string | null;
-  hometown: string;
-  occupation: string;
-  profilePicture: File;
-  privateInfo: PrivateInfo;
-  [key: string]: string | PrivateInfo | boolean | null | File;
-}
+import { EditProfileProps, PrivateInfo, FormState } from '../types/types';
 
 function EditProfile({ user }: EditProfileProps) {
   const [formState, setFormState] = useState<FormState>({
@@ -203,7 +172,6 @@ function EditProfile({ user }: EditProfileProps) {
           </div>
         </div>
 
-        {/* Hometown */}
         <div className="form-group">
           <label>Hometown:</label>
           <input
@@ -223,7 +191,6 @@ function EditProfile({ user }: EditProfileProps) {
           </div>
         </div>
 
-        {/* Occupation */}
         <div className="form-group">
           <label>Occupation:</label>
           <input

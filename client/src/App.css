@@ -49,6 +49,52 @@ body {
   margin-right: 0;
 }
 
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin: 10px;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  background-color: #f2f2f2;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-right: 30px;
+}
+
+.search-input {
+  padding: 10px;
+  border: none;
+  outline: none;
+  width: 150px;
+  border-radius: 4px 0 0 4px;
+}
+
+.search-button {
+  background-color: #4da6ff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 4px 4px 0;
+  width: 50px;
+  height: 100%;
+  min-height: 38px; 
+  transition: background-color 0.2s ease;
+}
+
+.search-button:hover {
+  background-color: #0071e9
+}
+
+.search-button svg {
+  width: 20px;
+  height: 20px;
+}
+
 .main-content {
   max-width: 1200px;
   margin: 20px auto;
@@ -377,8 +423,6 @@ textarea {
   width: 300px;
 }
 
-/* Add this CSS to your stylesheet */
-
 .notifications-dropdown {
   position: relative;
   display: inline-block;
@@ -514,4 +558,61 @@ textarea {
 
 .save-changes-btn:hover {
   background-color: #0055ff;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+}
+
+.user-card.current-user {
+  border: 2px solid #007bff;
+}
+
+.user-card-display-picture {
+  margin-right: 10px;
+}
+
+.user-card-display-picture img {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-card-details {
+  flex-grow: 1;
+}
+
+.user-card-friendship-actions {
+  display: flex;
+  align-items: center;
+}
+
+.friendship-actions {
+  display: flex;
+  gap: 5px;
+}
+
+.friendship-actions button {
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: block;
+  margin: 0 auto;
+}
+
+.friendship-actions button:hover {
+  background-color: #007bff;
+}
+
+.friendship-actions p {
+  margin: 0;
+  font-weight: bold;
 }

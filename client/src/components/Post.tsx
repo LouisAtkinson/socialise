@@ -1,23 +1,12 @@
 import React, { useState } from 'react';
-import Comment, { CommentProps } from './Comment'; 
+import Comment from './Comment'; 
 import blankImage from '../images/blank.png';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
-import { CommentData, Like } from './Home';
+import { CommentData, Like, PostProps } from '../types/types';
 import { Link } from 'react-router-dom';
 
-interface PostProps {
-  postId: string;
-  profilePicture: File | null;
-  fullName: string;
-  datetime: string;
-  content: string;
-  likes: Like[];
-  comments: CommentData[];
-  update: Function;
-}
-
-function Post({ postId, profilePicture, fullName, datetime, content, likes, comments, update }: PostProps) {
+function Post({ _id, content, author, date, likes, comments, update }: PostProps) {  
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -39,7 +28,7 @@ function Post({ postId, profilePicture, fullName, datetime, content, likes, comm
         return;
       }
   
-      const endpoint = isLiked ? `/api/posts/${postId}/unlike` : `/api/posts/${postId}/like`;
+      const endpoint = isLiked ? `/api/posts/${_id}/unlike` : `/api/posts/${_id}/like`;
       const method = isLiked ? 'DELETE' : 'POST';
 
       const response = await fetch(endpoint, {
@@ -74,7 +63,7 @@ function Post({ postId, profilePicture, fullName, datetime, content, likes, comm
         return;
       }
 
-      const response = await fetch(`/api/posts/${postId}`, {
+      const response = await fetch(`/api/posts/${_id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -101,7 +90,7 @@ function Post({ postId, profilePicture, fullName, datetime, content, likes, comm
           return;
         }
   
-        const response = await fetch(`/api/posts/${postId}/comments`, {
+        const response = await fetch(`/api/posts/${_id}/comments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -122,17 +111,6 @@ function Post({ postId, profilePicture, fullName, datetime, content, likes, comm
         }
   
         const newCommentData = await response.json();
-
-        // const comment: CommentProps = {
-        //   _id: newCommentData._id, 
-        //   profilePicture: newCommentData.commenter.profilePicture, 
-        //   fullName: newCommentData.commenter.fullName,
-        //   datetime: newCommentData.date,
-        //   content: newCommentData.content,
-        //   postId: postId,
-        //   update: update
-        // };
-    
         setNewComment('');
       } catch (error) {
         console.error('Error adding comment:', error);
@@ -144,12 +122,12 @@ function Post({ postId, profilePicture, fullName, datetime, content, likes, comm
     <div className="post">
       <div className="post-header">
         <img
-          src={profilePicture ? URL.createObjectURL(profilePicture) : blankImage}
-          alt={`${fullName}'s profile`}
+          src={author.profilePicture ? URL.createObjectURL(author.profilePicture) : blankImage}
+          alt={`${author.firstName}'s profile`}
         />        
         <div className="post-info">
-          <p>{fullName}</p>
-          <p>{datetime}</p>
+          <p>{`${author.firstName} ${author.lastName}`}</p>
+          <p>{date}</p>
         </div>
         <button className="delete-post" onClick={handleDeleteClick}>
           Delete
@@ -199,7 +177,7 @@ function Post({ postId, profilePicture, fullName, datetime, content, likes, comm
               fullName={`${comment.author.firstName} ${comment.author.lastName}`}
               datetime={comment.date} 
               content={comment.content}
-              postId={postId}
+              postId={_id}
               update={update}
             />
           ))}

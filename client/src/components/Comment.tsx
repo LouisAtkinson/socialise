@@ -2,16 +2,7 @@ import React from 'react';
 import blankImage from '../images/blank.png';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
-
-export interface CommentProps {
-  _id: string,
-  profilePicture: File | null;
-  fullName: string;
-  datetime: string;
-  content: string;
-  postId: string;
-  update: Function;
-}
+import { CommentProps } from '../types/types';
 
 function Comment({ _id, profilePicture, fullName, datetime, content, postId, update }: CommentProps) {
   const { user } = useAuthContext();

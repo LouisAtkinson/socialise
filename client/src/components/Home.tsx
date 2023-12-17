@@ -3,38 +3,7 @@ import PostForm from './PostForm';
 import Post from './Post';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
-
-interface PostData {
-  _id: string;
-  content: string;
-  author: {
-    _id: string;
-    profilePicture: File | null;
-    firstName: string;
-    lastName: string;
-  };
-  date: string;
-  likes: Like[];
-  comments: CommentData[];
-}
-
-export interface CommentData {
-  _id: string;
-  author: {
-    id: string;
-    profilePicture: File | null;
-    firstName: string;
-    lastName: string;
-  };
-  content: string;
-  date: string;
-}
-
-export interface Like {
-  _id: string;
-  firstName: string;
-  lastName: string;
-}
+import { CommentData, PostData, Like } from '../types/types';
 
 function Home() {
   const { user } = useAuthContext();
@@ -57,8 +26,26 @@ function Home() {
           'Content-Type': 'application/json',
         },
       });
-      const data = await response.json();
-      setPosts(data);
+
+      if (response.status === 401) {
+      logout();
+      return;
+    }
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Server error:', errorData.error);
+      return;
+    }
+
+    const data = await response.json();
+
+    if (data.error) {
+      console.error('Error from server:', data.error);
+      return;
+    }
+
+    setPosts(data);
     } catch (error) {
       console.error('Error fetching posts:', error);
     }
@@ -116,13 +103,7 @@ function Home() {
           posts.map((post) => (
             <Post
               key={post._id}
-              postId={post._id}
-              content={post.content}
-              profilePicture={post.author.profilePicture}
-              fullName={`${post.author.firstName} ${post.author.lastName}`}
-              datetime={post.date}
-              likes={post.likes}
-              comments={post.comments}
+              {...post}
               update={fetchPosts}
             />
           ))

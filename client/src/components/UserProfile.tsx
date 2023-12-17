@@ -5,56 +5,15 @@ import PostForm from './PostForm';
 import blankImage from '../images/blank.png';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
-import { Like } from './Home';
-
-interface PostProps {
-  _id: string;
-  content: string;
-  author: {
-    _id: string;
-    profilePicture: File | null;
-    firstName: string;
-    lastName: string;
-  };
-  date: string;
-  likes: Like[];
-  comments: CommentData[];
-  update: Function
-}
-
-interface CommentData {
-  _id: string;
-  author: {
-    id: string;
-    profilePicture: File | null;
-    firstName: string;
-    lastName: string;
-  };
-  content: string;
-  date: string;
-}
-
-interface UserProfile {
-  id: string;
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string | null;
-  hometown: string;
-  occupation: string;
-  profilePicture: File | null;
-  visibility: {
-    dateOfBirth: boolean;
-    hometown: boolean;
-    occupation: boolean;
-  };
-}
+import FriendButton from './FriendButton';
+import { PostProps, CommentData, UserProfileProps, Like } from '../types/types';
 
 function UserProfile() {
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const { id } = useParams<{ id: string }>();
   const [userPosts, setUserPosts] = useState<PostProps[]>([]);
-  const [userProfile, setUserProfile] = useState<UserProfile>({
+  const [userProfile, setUserProfile] = useState<UserProfileProps>({
     id: '',
     firstName: '',
     lastName: '',
@@ -69,6 +28,7 @@ function UserProfile() {
     }
   });
 
+  const [loading, setLoading] = useState<boolean>(true);
   const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null);
 
   const [friendsList, setFriendsList] = useState([
@@ -150,9 +110,13 @@ function UserProfile() {
   };
 
   useEffect(() => {
+    setLoading(true);
     fetch(`/api/user/${id}`)
       .then((response) => response.json())
-      .then((data) => setUserProfile(data))
+      .then((data) => {
+        setUserProfile(data);
+        setLoading(false);
+      })
       .catch((error) => console.error('Error fetching user data:', error));
   }, [id]);
 
@@ -200,51 +164,148 @@ function UserProfile() {
     return userProfile.id === currentUser?.id;
   };
 
-  useEffect(() => {
-    const checkFriendshipStatus = async () => {
-      try {
-        const token = user?.token;
+  const checkFriendshipStatus = async () => {
+    try {
+      const token = user?.token;
 
-        if (!token) {
-          logout();
-          return;
-        }
-
-        const response = await fetch(`/api/friends/status/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setFriendshipStatus(data.status);
-        } else {
-          console.error('Error checking friendship status:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error checking friendship status:', error);
+      if (!token) {
+        logout();
+        return;
       }
-    };
 
+      const response = await fetch(`/api/friends/status/${user?.id}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setFriendshipStatus(data.status);
+      } else {
+        console.error('Error checking friendship status:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error checking friendship status:', error);
+    }
+  };
+
+  useEffect(() => {
+    console.log('Use effect triggered:', id)
     checkFriendshipStatus();
-  }, [id, user]);
+  }, [id]);
 
   const handleAddFriend = async () => {
-    console.log('Sending friend request');
+    try {
+      const token = user?.token;
+
+      if (!token) {
+        logout();
+        return;
+      }
+
+      const response = await fetch(`/api/friends/add/${user?.id}/${id}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        console.log('Friend request sent successfully');
+        setFriendshipStatus('pending');
+      } else {
+        console.error('Error sending friend request:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error sending friend request:', error);
+    }
   };
 
   const handleAcceptFriendRequest = async () => {
-    console.log('Accepting friend request');
+    try {
+      const token = user?.token;
+
+      if (!token) {
+        logout();
+        return;
+      }
+
+      const response = await fetch(`/api/friends/accept/${user?.id}/${id}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        console.log('Friend request accepted successfully');
+        setFriendshipStatus('friends');
+      } else {
+        console.error('Error accepting friend request:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error accepting friend request:', error);
+    }
   };
 
   const handleDenyFriendRequest = async () => {
-    console.log('Denying friend request');
+    try {
+      const token = user?.token;
+
+      if (!token) {
+        logout();
+        return;
+      }
+
+      const response = await fetch(`/api/friends/deny/${user?.id}/${id}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        console.log('Friend request denied successfully');
+        setFriendshipStatus(null);
+      } else {
+        console.error('Error denying friend request:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error denying friend request:', error);
+    }
   };
 
   const handleRemoveFriend = async () => {
-    console.log('Removing friend');
+    try {
+      const token = user?.token;
+
+      if (!token) {
+        logout();
+        return;
+      }
+
+      const response = await fetch(`/api/friends/remove/${user?.id}/${id}`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        console.log('Friend removed successfully');
+        setFriendshipStatus(null);
+      } else {
+        console.error('Error removing friend:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error removing friend:', error);
+    }
   };
+
+  if (loading) {
+    return <h3>Loading...</h3>
+  }
 
   return (
     <div className="user-profile">
@@ -255,31 +316,7 @@ function UserProfile() {
           </Link>
         </div>
         <h2>{`${userProfile.firstName} ${userProfile.lastName}`}</h2>
-        {id !== user?.id && (
-          <div>
-            {friendshipStatus === 'friends' ? (
-              <button onClick={handleRemoveFriend}>Remove Friend</button>
-            ) : friendshipStatus === 'pendingSent' ? (
-              <span>Friend Request Pending</span>
-            ) : friendshipStatus === 'pendingReceived' ? (
-              <>
-                <button onClick={handleAcceptFriendRequest}>Accept Friend Request</button>
-                <button onClick={handleDenyFriendRequest}>Deny Friend Request</button>
-              </>
-            ) : (
-              <button onClick={handleAddFriend}>Add Friend</button>
-            )}
-          </div>
-        )}
-        {userProfile.dateOfBirth && userProfile.visibility.dateOfBirth && (
-          <p>Birthday: {new Date(userProfile.dateOfBirth).toLocaleDateString()}</p>
-        )}
-        {userProfile.hometown && userProfile.visibility.hometown && (
-          <p>Hometown: {userProfile.hometown}</p>
-        )}
-        {userProfile.occupation && userProfile.visibility.occupation && (
-          <p>Occupation: {userProfile.occupation}</p>
-        )}
+        <FriendButton userId={userProfile.id} />
         {isCurrentUserProfile() && (
           <Link to={`/user/${userProfile.id}/edit-profile`} state={{ user }}>
             <button className="edit-profile-button">Edit Profile</button>
@@ -309,13 +346,7 @@ function UserProfile() {
           userPosts.map((post) => (
             <Post
               key={post._id} 
-              postId={post._id}
-              profilePicture={post.author.profilePicture}
-              fullName={`${post.author.firstName} ${post.author.lastName}`}
-              datetime={post.date} 
-              content={post.content}
-              likes={post.likes} 
-              comments={post.comments} 
+              {...post}
               update={fetchUserPosts}
             />
           ))

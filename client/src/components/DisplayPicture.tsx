@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import blankImage from '../images/blank.png';
 import Comment from './Comment';
-import { CommentData } from './Home';
+import { CommentData } from '../types/types';
 
 function DisplayPicture() {
   const [isLiked, setIsLiked] = useState(false);
@@ -59,7 +59,6 @@ function DisplayPicture() {
         onChange={(e) => setComment(e.target.value)}
       />
       <button onClick={handleCommentSubmit}>Comment</button>
-      {/* Display comments using the Comment component */}
       {comments.map((comment) => (
         <Comment
           key={comment._id}
