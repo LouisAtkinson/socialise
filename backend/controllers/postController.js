@@ -21,6 +21,10 @@ const getAllPosts = async (req, res) => {
           select: 'firstName lastName displayPicture',
         },
         select: 'date',
+        populate: {
+          path: 'likes',
+          select: 'firstName lastName displayPicture',
+        },
       })
       .populate({
         path: 'likes',
@@ -71,33 +75,36 @@ const deletePost = async (req, res) => {
 };
 
 const addComment = async (req, res) => {
-    try {
-      const userId = req.body.user.id;
-      const postId = req.params.postId;
-      const { content } = req.body;
-  
-      const post = await Post.findById(postId);
-  
-      if (!post) {
-        return res.status(404).json({ error: 'Post not found' });
-      }
-  
-      const newComment = {
-        _id: new mongoose.Types.ObjectId(),
-        author: userId,
-        content,
-        date: new Date(),
-      };
-  
-      post.comments.push(newComment);
-      await post.save();
-  
-      res.status(201).json(newComment);
-    } catch (error) {
-      console.error('Error adding comment:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+  try {
+    const userId = req.body.user.id;
+    const postId = req.params.postId;
+    const { content } = req.body;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
     }
-  };
+
+    const newComment = await Comment.create({
+      _id: new mongoose.Types.ObjectId(),
+      author: userId,
+      content,
+      date: new Date(),
+      postId: postId
+    });
+
+    const savedComment = await newComment.save();
+
+    post.comments.push(savedComment._id);
+    await post.save();
+
+    res.status(201).json(newComment);
+  } catch (error) {
+    console.error('Error adding comment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
   
 
 const deleteComment = async (req, res) => {
@@ -181,6 +188,73 @@ const unlikePost = async (req, res) => {
   }
 };
 
+const likeComment = async (req, res) => {
+  try {
+    const postId = req.params.postId;
+    const commentId = req.params.commentId;
+    const userId = req.body.user.id;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    const comment = post.comments.id(commentId);
+
+    if (!comment) {
+      return res.status(404).json({ error: 'Comment not found' });
+    }
+
+    if (comment.likes.includes(userId)) {
+      return res.status(400).json({ error: 'Comment already liked' });
+    }
+
+    comment.likes.push(userId);
+    await post.save();
+
+    res.status(200).json({ message: 'Comment liked successfully' });
+  } catch (error) {
+    console.error('Error liking comment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+const unlikeComment = async (req, res) => {
+  try {
+    const postId = req.params.postId;
+    const commentId = req.params.commentId;
+    const userId = req.body.user.id;
+
+    const post = await Post.findById(postId);
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+
+    const comment = post.comments.id(commentId);
+
+    if (!comment) {
+      return res.status(404).json({ error: 'Comment not found' });
+    }
+
+    const likeIndex = comment.likes.indexOf(userId);
+
+    if (likeIndex === -1) {
+      return res.status(400).json({ error: 'Comment not liked' });
+    }
+
+    comment.likes.splice(likeIndex, 1);
+    await post.save();
+
+    res.status(200).json({ message: 'Like removed from comment successfully' });
+  } catch (error) {
+    console.error('Error removing like from comment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
 module.exports = {
     getAllPosts,
     addPost,
@@ -188,5 +262,7 @@ module.exports = {
     addComment,
     deleteComment,
     likePost,
-    unlikePost
+    unlikePost,
+    likeComment,
+    unlikeComment
 };

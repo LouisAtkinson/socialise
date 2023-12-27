@@ -3,7 +3,7 @@ export interface PostData {
     content: string;
     author: {
       _id: string;
-      profilePicture: File | null;
+      profilePicture: string | null;
       firstName: string;
       lastName: string;
     };
@@ -17,7 +17,7 @@ export interface PostProps {
     content: string;
     author: {
       _id: string;
-      profilePicture: File | null;
+      profilePicture: string | null;
       firstName: string;
       lastName: string;
     };
@@ -31,22 +31,25 @@ export interface CommentData {
     _id: string;
     author: {
         id: string;
-        profilePicture: File | null;
+        profilePicture: string | null;
         firstName: string;
         lastName: string;
     };
     content: string;
     date: string;
+    likes: Like[];
 }
 
 export interface CommentProps {
     _id: string,
-    profilePicture: File | null;
+    profilePicture: string | null;
     fullName: string;
     datetime: string;
     content: string;
-    postId: string;
+    parentId: string;
+    likes: Like[];
     update: Function;
+    type: string;
 }
   
 export interface Like {
@@ -59,16 +62,25 @@ export interface UserProfileProps {
     id: string;
     firstName: string;
     lastName: string;
-    dateOfBirth: string | null;
+    birthDay: string;
+    birthMonth: string;
     hometown: string;
     occupation: string;
-    profilePicture: File | null;
+    profilePicture: string | null;
     visibility: {
         dateOfBirth: boolean;
         hometown: boolean;
         occupation: boolean;
     };
 }
+
+export interface UserFriendProps {
+    friend: {
+      _id: string;
+      firstName: string;
+      lastName: string;
+    };
+  }
 
 export interface SearchBarProps {
     initialQuery?: string;
@@ -80,7 +92,7 @@ export interface FriendButtonProps {
 
 export interface UserCardProps {
     id: string;
-    profilePicture: File | null;
+    profilePicture: string | null;
     firstName: string;
     lastName: string;
     hometown: string | null;
@@ -90,20 +102,26 @@ export interface UserCardProps {
 }
 
 export interface EditProfileProps {
-    user: {
+    currentUser: {
       id: string;
       firstName: string;
       lastName: string;
-      dateOfBirth: Date | null;
+      birthDay: string;
+      birthMonth: string;
       hometown: string;
       occupation: string;
-      profilePicture: File;
+      profilePicture: string;
       visibility: {
         dateOfBirth: boolean;
         hometown: boolean;
         occupation: boolean;
       };
     };
+}
+
+export interface BirthdayFormProps {
+    formState: FormState;
+    handleInputChange: (e: React.ChangeEvent<any>) => void;
 }
   
 export interface PrivateInfo {
@@ -113,14 +131,27 @@ export interface PrivateInfo {
 }
   
 export interface FormState {
-    dateOfBirth: string | null;
+    birthDay: string;
+    birthMonth: string;
     hometown: string;
     occupation: string;
-    profilePicture: File;
+    profilePicture: string | null | File;
     privateInfo: PrivateInfo;
     [key: string]: string | PrivateInfo | boolean | null | File;
 }
 
 export interface PostFormProps {
     onSubmit: (postContent: string) => void;
+}
+
+export interface NotificationType {
+    id: string;
+    sender: {
+      firstName: string;
+      lastName: string;
+      displayPicture: string | null;
+    };
+    type: string;
+    content: string;
+    isRead: boolean;
 }

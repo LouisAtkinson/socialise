@@ -11,7 +11,7 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
       type: String,
-      enum: ['friendRequest', 'comment', 'like'],
+      enum: ['friendRequest', 'friendRequestAccepted', 'comment', 'like'],
     },
     content: String, 
     timestamp: {
@@ -24,4 +24,4 @@ const notificationSchema = new mongoose.Schema({
     },
 });
 
-module.exports = mongoose.model('Notification', notificationSchema)
+module.exports = mongoose.model('Notification', notificationSchema);

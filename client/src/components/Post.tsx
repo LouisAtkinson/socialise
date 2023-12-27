@@ -5,7 +5,7 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
 import { CommentData, Like, PostProps } from '../types/types';
 import { Link } from 'react-router-dom';
-import { formatDate } from '../helpers/helpers';
+import { formatDate, fetchDisplayPicture } from '../helpers/helpers';
 
 function Post({ _id, content, author, date, likes, comments, update }: PostProps) {  
   const { user } = useAuthContext();
@@ -13,12 +13,24 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [showComments, setShowComments] = useState<boolean>(false);
   const [newComment, setNewComment] = useState<string>('');
+  const [authorProfilePicture, setAuthorProfilePicture] = useState<string | null>(null);
+  const firstComment = comments?.length ? comments[0] : null;
+  const remainingComments = comments?.slice(1);
 
   const [likesCount, setLikesCount] = useState<number>(likes.length);
 
   React.useEffect(() => {
     setIsLiked(likes.some(like => like._id === user?.id));
   }, [likes, user]);
+
+  React.useEffect(() => {
+    const getProfilePicture = async () => {
+      const picture = await fetchDisplayPicture(author._id);
+      setAuthorProfilePicture(picture);
+    };
+
+    getProfilePicture();
+  }, [author._id]);
 
   const handleLikeClick = async () => {
     try {
@@ -124,7 +136,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
       <div className="post-header">
         <Link to={`/user/${author._id}`}>
           <img
-            src={author.profilePicture ? URL.createObjectURL(author.profilePicture) : blankImage}
+            src={authorProfilePicture ? authorProfilePicture : blankImage}
             alt={`${author.firstName}'s display picture`}
           />
         </Link>
@@ -139,33 +151,46 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
         </button>
       </div>
       <p className="post-content">{content}</p>
+  
+      {firstComment && (
+        <div className="first-comment">
+          <Comment
+            key={firstComment._id}
+            _id={firstComment._id}
+            profilePicture={authorProfilePicture}
+            fullName={`${firstComment.author.firstName} ${firstComment.author.lastName}`}
+            datetime={firstComment.date}
+            content={firstComment.content}
+            likes={firstComment.likes}
+            parentId={_id}
+            update={update}
+            type="Post"
+          />
+        </div>
+      )}
+  
+      {remainingComments?.length > 0 && (
+        <button
+          className="show-more-comments-button"
+          onClick={() => setShowComments(!showComments)}
+        >
+          {showComments ? 'Hide Comments' : `Show ${remainingComments.length} More Comments`}
+        </button>
+      )}
+  
       <div className="post-actions">
         <button className="like-button" onClick={handleLikeClick}>
           {isLiked ? 'Unlike' : 'Like'}
         </button>
-        <p className="likes">
-          {likes.length === 1 && (
-            <>
-              <Link to={`/user/${likes[0]._id}`} style={{ color: 'blue' }}>
-                {likes[0].firstName} {likes[0].lastName}
-              </Link>{' '}
-              liked this
-            </>
-          )}
-          {likes.length > 1 && (
-            <>
-              <Link to={`/user/${likes[0]._id}`} style={{ color: 'blue' }}>
-                {likes[0].firstName} {likes[0].lastName}
-              </Link>{' '}
-              and{' '}
-              {likes.length - 1} {likes.length - 1 === 1 ? 'other' : 'others'} liked this
-            </>
-          )}
-        </p>    
-        <button className="comment-button" onClick={() => setShowComments(!showComments)}>
-          {showComments ? 'Hide Comments' : 'Comment'}
+  
+        <button
+          className="comment-button"
+          onClick={() => setShowComments(!showComments)}
+        >
+          Comment
         </button>
       </div>
+  
       {showComments && (
         <div className="comments">
           <textarea
@@ -174,22 +199,24 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
             onChange={(e) => setNewComment(e.target.value)}
           />
           <button onClick={handleCommentSubmit}>Submit</button>
-          {comments.map((comment) => (
+          {remainingComments?.map((comment) => (
             <Comment
               key={comment._id}
-              _id={comment._id} 
-              profilePicture={comment.author.profilePicture} 
+              _id={comment._id}
+              profilePicture={authorProfilePicture}
               fullName={`${comment.author.firstName} ${comment.author.lastName}`}
-              datetime={comment.date} 
+              datetime={comment.date}
               content={comment.content}
-              postId={_id}
+              likes={comment.likes}
+              parentId={_id}
               update={update}
+              type="Post"
             />
           ))}
         </div>
       )}
     </div>
-  );
+  );  
 }
 
 export default Post;

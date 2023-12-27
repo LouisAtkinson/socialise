@@ -12,6 +12,7 @@ import EditProfile from './components/EditProfile';
 import Login from './components/Login';
 import Register from './components/Register';
 import SearchPage from './components/SearchPage';
+import FriendPage from './components/FriendPage';
 
 function App() {
   const { user } = useAuthContext();
@@ -36,15 +37,19 @@ function App() {
             >
             </Route>
             <Route 
-                path="/user/:id/display-picture" 
-                element={user ? <DisplayPicture /> : <Navigate to='/login' />}
-              />
-              <Route 
-                path="/user/:id/edit-profile" 
-                element={user ? <EditProfile 
-                  user={user}
-                /> : <Navigate to='/login' />}
-              />
+              path="/user/:id/display-picture" 
+              element={user ? <DisplayPicture /> : <Navigate to='/login' />}
+            />
+            <Route 
+              path="/user/:id/edit-profile" 
+              element={user 
+                ? <EditProfile currentUser={user}/> 
+                : <Navigate to='/login' />}
+            />
+            <Route
+              path="user/:id/friends"
+              element={user ? <FriendPage /> : <Navigate to='/login' />}
+            />
             <Route
               path="/search"
               element={user ? <SearchPage /> : <Navigate to='/login' />}

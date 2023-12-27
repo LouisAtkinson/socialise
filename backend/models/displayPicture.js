@@ -12,15 +12,8 @@ const displayPictureSchema = new mongoose.Schema({
   },
   comments: [
     {
-      userId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-      },
-      content: String,
-      datetime: {
-        type: Date,
-        default: Date.now,
-      },
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment',
     },
   ],
   likes: [

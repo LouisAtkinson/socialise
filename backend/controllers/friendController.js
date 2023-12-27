@@ -153,17 +153,26 @@ const acceptFriendRequest = async (req, res) => {
     );
 
     if (friendRequestNotification) {
-      loggedInUser.friends.push(otherUserObjectId);
-      otherUser.friends.push(loggedInObjectId);
-
       loggedInUser.notifications = loggedInUser.notifications.filter(
         (notificationId) => !notificationId.equals(friendRequestNotification._id)
       );
 
       await Notification.findByIdAndRemove(friendRequestNotification._id);
 
+      loggedInUser.friends.push(otherUserObjectId);
+      otherUser.friends.push(loggedInObjectId);
+
       await loggedInUser.save();
       await otherUser.save();
+
+      const friendRequestAcceptedNotification = new Notification({
+        sender: otherUserObjectId,
+        recipient: loggedInObjectId,
+        type: 'friendRequestAccepted',
+        content: 'Your friend request has been accepted.',
+      });
+
+      await friendRequestAcceptedNotification.save();
 
       res.status(200).json({ message: 'Friend request accepted successfully' });
     } else {
@@ -174,6 +183,7 @@ const acceptFriendRequest = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 
 const denyFriendRequest = async (req, res) => {
   try {

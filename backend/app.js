@@ -13,8 +13,10 @@ const app = express();
 const cors = require('cors');
 
 app.use(morgan('combined'));
-app.use(bodyParser.json());
+// app.use(bodyParser.json());
 app.use(cors());
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 
 app.use(session({
   secret: process.env.SECRET, 
@@ -54,7 +56,10 @@ const friendRouter = require('./routes/friendRoutes');
 app.use('/api/friends', friendRouter);
 
 const displayPictureRoutes = require('./routes/displayPictureRoutes');
-app.use('/display-pictures', displayPictureRoutes);
+app.use('/api/display-pictures', displayPictureRoutes);
+
+const notificationRoutes = require('./routes/notificationRoutes');
+app.use('/api', notificationRoutes);
 
 app.use(express.static(path.join(__dirname, '../client/build')));
 

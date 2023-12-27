@@ -2,17 +2,22 @@ import React, { useState, ChangeEvent, FormEvent, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
 import blankImage from '../images/blank.png';
 import { EditProfileProps, PrivateInfo, FormState } from '../types/types';
+import BirthdayForm from './BirthdayForm';
+import { useAuthContext } from '../hooks/useAuthContext';
+import { useLogout } from '../hooks/useLogout';
+import { fetchDisplayPicture } from '../helpers/helpers';
 
-function EditProfile({ user }: EditProfileProps) {
+function EditProfile({ currentUser }: EditProfileProps) {
   const [formState, setFormState] = useState<FormState>({
-    dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : '',
-    hometown: user.hometown || '',
-    occupation: user.occupation || '',
-    profilePicture: user.profilePicture || '',
+    birthDay: currentUser.birthDay || '',
+    birthMonth: currentUser.birthMonth || '',
+    hometown: currentUser.hometown || '',
+    occupation: currentUser.occupation || '',
+    profilePicture: currentUser.profilePicture || '',
     privateInfo: {
-      dateOfBirth: !user.visibility?.dateOfBirth || true,
-      hometown: !user.visibility?.hometown || true,
-      occupation: !user.visibility?.occupation || true,
+      dateOfBirth: !currentUser.visibility?.dateOfBirth || true,
+      hometown: !currentUser.visibility?.hometown || true,
+      occupation: !currentUser.visibility?.occupation || true,
     },
   });
 
@@ -21,21 +26,24 @@ function EditProfile({ user }: EditProfileProps) {
   const [changesSaved, setChangesSaved] = useState(false);
 
   const navigate = useNavigate();
+  const { user } = useAuthContext();
+  const { logout } = useLogout();
 
   React.useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`/api/user/${user.id}`);
+        const response = await fetch(`/api/user/${currentUser.id}`);
         if (response.ok) {
           const userData = await response.json();
           
-          console.log(userData.visibility?.dateOfBirth)
+          const displayPicture = await fetchDisplayPicture(currentUser.id);
 
           setFormState({
-            dateOfBirth: userData.dateOfBirth ? new Date(userData.dateOfBirth).toISOString().split('T')[0] : '',
+            birthDay: userData.birthDay || '',
+            birthMonth: userData.birthMonth || '',
             hometown: userData.hometown || '',
             occupation: userData.occupation || '',
-            profilePicture: userData.profilePicture || '',
+            profilePicture: displayPicture || '',
             privateInfo: {
               dateOfBirth: userData.visibility?.dateOfBirth || true,
               hometown: userData.visibility?.hometown || true,
@@ -51,7 +59,7 @@ function EditProfile({ user }: EditProfileProps) {
     };
 
     fetchUserData();
-  }, [user.id]);
+  }, [currentUser.id]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -65,11 +73,11 @@ function EditProfile({ user }: EditProfileProps) {
         },
       }) as FormState);
     } else {
-      const updatedValue = name === 'dateOfBirth' ? new Date(value) : value;
+      // const updatedValue = name === 'dateOfBirth' ? new Date(value) : value;
 
       setFormState((prevFormState) => ({
         ...prevFormState,
-        [name]: updatedValue,
+        [name]: value,
       }) as FormState);
     };
 
@@ -97,33 +105,53 @@ function EditProfile({ user }: EditProfileProps) {
     try {
       setIsSaving(true);
 
-      const formData = new FormData();
-      formData.append('file', formState.profilePicture);
-
-      formData.append('dateOfBirth', formState.dateOfBirth || '');
-      formData.append('hometown', formState.hometown || '');
-      formData.append('occupation', formState.occupation || '');
-      formData.append('privateInfo', JSON.stringify(formState.privateInfo));
-
-      console.log(formData);
-      const response = await fetch(`/api/user/${user.id}`, {
+      const userInfoResponse = await fetch(`/api/user/${currentUser.id}`, {
         method: 'PUT',
-        body: formData,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          birthDay: formState.birthDay || '',
+          birthMonth: formState.birthMonth || '',
+          hometown: formState.hometown || '',
+          occupation: formState.occupation || '',
+          privateInfo: formState.privateInfo,
+        }),
       });
 
-      if (response.ok) {
-        setChangesSaved(true);
-        setUnsaved(false);
-        const updatedVisibility = {
-          dateOfBirth: !formState.privateInfo.dateOfBirth,
-          hometown: !formState.privateInfo.hometown,
-          occupation: !formState.privateInfo.occupation,
-        };
-
-        console.log('Changes saved:', updatedVisibility);
-      } else {
-        console.error('Failed to update user information', response);
+      if (!userInfoResponse.ok) {
+        console.error('Failed to update user information', userInfoResponse);
       }
+
+      if (formState.profilePicture instanceof File) {
+        const token = user?.token;
+  
+        if (!token) {
+          logout();
+          return;
+        }
+
+        const displayPictureFormData = new FormData();
+        displayPictureFormData.append('file', formState.profilePicture);
+
+        console.log(displayPictureFormData);
+  
+        const displayPictureResponse = await fetch(`/api/display-pictures/${user.id}`, {
+          method: 'POST',
+          body: displayPictureFormData,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (!displayPictureResponse.ok) {
+          console.error('Failed to upload display picture', displayPictureResponse);
+          throw new Error('Failed to upload display picture');
+        }
+      }
+  
+      setChangesSaved(true);
+      setUnsaved(false);  
     } catch (error) {
       console.error('Error updating user information:', error);
     } finally {
@@ -132,7 +160,7 @@ function EditProfile({ user }: EditProfileProps) {
   };
 
   const handleReturnToProfile = () => {
-    navigate(`/user/${user.id}`);
+    navigate(`/user/${currentUser.id}`);
   };
 
 
@@ -155,12 +183,7 @@ function EditProfile({ user }: EditProfileProps) {
 
         <div className="form-group">
           <label>Date of Birth:</label>
-          <input
-            type="date"
-            name="dateOfBirth"
-            value={formState.dateOfBirth || ''}
-            onChange={handleInputChange}
-          />
+          <BirthdayForm formState={formState} handleInputChange={handleInputChange} />
           <div className="checkbox-label">
             <input
               type="checkbox"

@@ -6,12 +6,59 @@ import { CommentProps } from '../types/types';
 import { formatDate } from '../helpers/helpers';
 import { Link } from 'react-router-dom';
 
-function Comment({ _id, profilePicture, fullName, datetime, content, postId, update }: CommentProps) {
+function Comment({ _id, profilePicture, fullName, datetime, content, likes, parentId, update, type }: CommentProps) {
   const { user } = useAuthContext();
   const { logout } = useLogout();
+  const [isLiked, setIsLiked] = React.useState<boolean>(false);
+  const [likesCount, setLikesCount] = React.useState<number>(likes.length);
+
+  React.useEffect(() => {
+    setIsLiked(likes.some(like => like._id === user?.id));
+  }, [likes, user]);
+
+  const handleLikeClick = async () => {
+    try {
+      const token = user?.token;
+  
+      if (!token) {
+        logout();
+        return;
+      }
+  
+      const endpoint = isLiked 
+        ? `/api/posts/${parentId}/comments/${_id}/unlike` 
+        : `/api/posts/${parentId}/comments/${_id}/like`;
+      const method = isLiked ? 'DELETE' : 'POST';
+
+      const response = await fetch(endpoint, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          user: { id: user.id },
+        }),
+      });
+  
+      if (!response.ok) {
+        console.error('Error liking post:', response.statusText);
+        return;
+      }
+      update();
+      setIsLiked(!isLiked);
+      setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
   
   const handleDeleteClick = async () => {
     try {
+      const endpoint = (type === 'post')
+        ? `/api/posts/${parentId}/comments/${_id}`
+        : `/api/display-pictures/${parentId}/comments/${_id}` 
+
       const token = user?.token;
 
       if (!token) {
@@ -19,7 +66,7 @@ function Comment({ _id, profilePicture, fullName, datetime, content, postId, upd
         return;
       }
 
-      const response = await fetch(`/api/posts/${postId}/comments/${_id}`, {
+      const response = await fetch(endpoint, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -40,7 +87,7 @@ function Comment({ _id, profilePicture, fullName, datetime, content, postId, upd
     <div className="comment">
       <Link to={`/user/${_id}`}>
         <img
-          src={profilePicture ? URL.createObjectURL(profilePicture) : blankImage}
+          src={profilePicture ? profilePicture : blankImage}
           alt={`${fullName}'s display picture`}
         />
       </Link>
@@ -51,7 +98,31 @@ function Comment({ _id, profilePicture, fullName, datetime, content, postId, upd
           </Link>
           <p>{formatDate(datetime)}</p>
         </div>
-        <p className="comment-content">{content}</p>          
+        <p className="comment-content">{content}</p>    
+        <div className="post-actions">
+        <button className="like-button" onClick={handleLikeClick}>
+          {isLiked ? 'Unlike' : 'Like'}
+        </button>
+        <p className="likes">
+          {likes.length === 1 && (
+            <>
+              <Link to={`/user/${likes[0]._id}`} style={{ color: 'blue' }}>
+                {likes[0].firstName} {likes[0].lastName}
+              </Link>{' '}
+              liked this
+            </>
+          )}
+          {likes.length > 1 && (
+            <>
+              <Link to={`/user/${likes[0]._id}`} style={{ color: 'blue' }}>
+                {likes[0].firstName} {likes[0].lastName}
+              </Link>{' '}
+              and{' '}
+              {likes.length - 1} {likes.length - 1 === 1 ? 'other' : 'others'} liked this
+            </>
+          )}
+        </p> 
+      </div>      
       </div>
       <button className="delete-comment" onClick={handleDeleteClick}>
         Delete

@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
     required: true
   },
   visibility: {
-    dateOfBirth: {
+    birthday: {
       type: Boolean,
       default: false,
     },
@@ -35,8 +35,12 @@ const userSchema = new mongoose.Schema({
       default: false,
     },
   },
-  dateOfBirth: {
-    type: Date,
+  birthDay: {
+    type: String,
+    required: false,
+  },
+  birthMonth: {
+    type: String,
     required: false,
   },
   hometown: {

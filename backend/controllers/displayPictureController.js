@@ -1,99 +1,175 @@
 const mongoose = require('mongoose');
-const grid = require('gridfs-stream');
+const Comment = require('../models/comment');
 const DisplayPicture = require('../models/displayPicture');
+const multer = require('multer');
+const { GridFSBucket } = require('mongodb');
+const User = require('../models/user');
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 const connection = mongoose.connection;
-grid.mongo = mongoose.mongo;
 
 let gfs;
+
 connection.once('open', () => {
-  gfs = grid(connection.db);
+  try {
+    gfs = new mongoose.mongo.GridFSBucket(connection.db, { bucketName: 'uploads' });
+    console.log('Connected to MongoDB');
+  } catch (error) {
+    console.error('Error initializing GridFS:', error);
+  }
 });
 
-exports.uploadDisplayPicture = async (userId, filename, fileBuffer) => {
+exports.uploadDisplayPicture = async (req, res) => {
   try {
-    const writeStream = gfs.createWriteStream({ filename, metadata: { userId } });
-    writeStream.write(fileBuffer);
-    writeStream.end();
+    debugger;
+    const { userId } = req.params;
+    const { buffer, originalname } = req.file;
 
-    return writeStream.id;
-  } catch (error) {
-    throw new Error(`Error uploading display picture: ${error.message}`);
-  }
-};
+    
 
-exports.getDisplayPictureIdByUserId = async (userId) => {
-  try {
-    const file = await DisplayPicture.findOne({ userId });
-    return file ? file.id : null;
-  } catch (error) {
-    throw new Error(`Error getting display picture ID by user ID: ${error.message}`);
-  }
-};
+    console.log(req.file)
 
-exports.getDisplayPictureById = (displayPictureId) => {
-  try {
-    return gfs.createReadStream({ _id: displayPictureId });
-  } catch (error) {
-    throw new Error(`Error getting display picture: ${error.message}`);
-  }
-};
-
-exports.addComment = async (displayPictureId, userId, content) => {
-  try {
-    const newComment = {
-      userId,
-      content,
-      datetime: new Date(),
-    };
-
-    await DisplayPicture.findByIdAndUpdate(displayPictureId, {
-      $push: { comments: newComment },
+    const uploadStream = gfs.openUploadStream(originalname, {
+      metadata: {
+        userId,
+        filename: originalname,
+      },
     });
 
-    return newComment;
+    uploadStream.write(buffer);
+    uploadStream.end();
+
+    uploadStream.on('finish', async () => {
+      const displayPictureId = uploadStream.id;
+
+      await User.findByIdAndUpdate(userId, { displayPicture: new mongoose.Types.ObjectId(displayPictureId) });
+      res.status(201).json({ fileId: displayPictureId });
+    });
   } catch (error) {
-    throw new Error(`Error adding comment: ${error.message}`);
+    console.log('Oh no', error)
+    res.status(500).json({ error: error.message });
   }
 };
 
-exports.removeComment = async (displayPictureId, commentId, userId) => {
+exports.getDisplayPictureByUserId = async (req, res) => {
   try {
-    const displayPicture = await DisplayPicture.findById(displayPictureId);
-    const commentIndex = displayPicture.comments.findIndex(
-      (comment) => comment._id.equals(commentId) && comment.userId.equals(userId)
-    );
+    const { userId } = req.params;
+    const displayPictureId = await getDisplayPictureIdByUserId(userId);
 
-    if (commentIndex === -1) {
-      throw new Error('User is not authorized to remove this comment');
+    if (!displayPictureId) {
+      return res.status(404).json({ error: 'Display picture not found for the user' });
     }
 
-    displayPicture.comments.splice(commentIndex, 1);
+    console.log(displayPictureId)
+
+    const downloadStream = gfs.openDownloadStream(displayPictureId);
+
+    downloadStream.on('data', (chunk) => {
+      res.write(chunk);
+    });
+
+    downloadStream.on('end', () => {
+      res.end();
+    });
+
+    downloadStream.on('error', (error) => {
+      console.error('Error in download stream:', error);
+      res.status(500).json({ error: error.message });
+    });
+  } catch (error) {
+    console.error('Error in getDisplayPictureByUserId:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+async function getDisplayPictureIdByUserId(userId) {
+  try {
+    const user = await User.findById(userId);
+    return user ? user.displayPicture : null;
+  } catch (error) {
+    throw new Error(`Error retrieving display picture ID for user: ${error.message}`);
+  }
+}
+
+exports.getDisplayPictureDetails = async (req, res, next) => {
+  const { userId } = req.params;
+
+  try {
+    const displayPicture = await DisplayPicture.findOne({ userId })
+      .populate('comments')
+      .populate('likes');
+
+    if (!displayPicture) {
+      return res.status(404).json({ message: 'User does not have a display picture' });
+    }
+
+    res.status(200).json({
+      displayPictureId: displayPicture._id,
+      uploadDate: displayPicture.uploadDate,
+      comments: displayPicture.comments,
+      likes: displayPicture.likes,
+    });
+  } catch (error) {
+    console.error('Error fetching user display picture details:', error);
+    res.status(500).json({ message: 'Internal Server Error' });
+  }
+};
+
+exports.addComment = async (req, res) => {
+  try {
+    const userId = req.body.user.id;
+    const displayPictureId = req.params.displayPictureIdId;
+    const { content } = req.body;
+
+    const displayPicture = await DisplayPicture.findById(displayPictureId);
+
+    if (!displayPicture) {
+      return res.status(404).json({ error: 'Display picture not found' });
+    }
+
+    const newComment = await Comment.create({
+      _id: new mongoose.Types.ObjectId(),
+      author: userId,
+      content,
+      date: new Date(),
+      displayPictureId: displayPictureId
+    });
+
+    const savedComment = await newComment.save();
+
+    displayPicture.comments.push(savedComment._id);
     await displayPicture.save();
 
-    return true;
+    res.status(201).json(newComment);
   } catch (error) {
-    throw new Error(`Error removing comment: ${error.message}`);
+    res.status(500).json({ error: error.message });
   }
 };
 
-exports.toggleLike = async (displayPictureId, userId) => {
+exports.removeComment = async (req, res) => {
   try {
-    const displayPicture = await DisplayPicture.findById(displayPictureId);
-    const isLiked = displayPicture.likes.includes(userId);
+    const { displayPictureId, commentId } = req.params;
+    const { userId } = req.user;
 
-    if (isLiked) {
-      await DisplayPicture.findByIdAndUpdate(displayPictureId, {
-        $pull: { likes: userId },
-      });
-    } else {
-      await DisplayPicture.findByIdAndUpdate(displayPictureId, {
-        $push: { likes: userId },
-      });
-    }
+    await removeComment(displayPictureId, commentId, userId);
 
-    return true;
+    res.json({ message: 'Comment removed successfully' });
   } catch (error) {
-    throw new Error(`Error toggling like: ${error.message}`);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+exports.toggleLike = async (req, res) => {
+  try {
+    const { displayPictureId } = req.params;
+    const { userId } = req.user;
+
+    await toggleLike(displayPictureId, userId);
+
+    res.status(201).json({ message: 'Like toggled successfully' });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 };

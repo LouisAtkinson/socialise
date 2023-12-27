@@ -7,6 +7,8 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
 import FriendButton from './FriendButton';
 import { PostProps, CommentData, UserProfileProps, Like } from '../types/types';
+import { fetchDisplayPicture } from '../helpers/helpers';
+import UserFriend from './UserFriend';
 
 function UserProfile() {
   const { user } = useAuthContext();
@@ -17,7 +19,8 @@ function UserProfile() {
     id: '',
     firstName: '',
     lastName: '',
-    dateOfBirth: null,
+    birthDay: '',
+    birthMonth: '',
     hometown: '',
     occupation: '',
     profilePicture: null,
@@ -106,13 +109,21 @@ function UserProfile() {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/user/${id}`)
-      .then((response) => response.json())
-      .then((data) => {
-        setUserProfile(data);
-        setLoading(false);
-      })
-      .catch((error) => console.error('Error fetching user data:', error));
+    Promise.all([
+      fetch(`/api/user/${id}`).then((response) => response.json()),
+      fetch(`/api/display-pictures/user/${id}`).then((response) => response.blob())
+    ])
+    .then(([userData, displayPictureBlob]) => {
+      console.log(displayPictureBlob)
+      if (displayPictureBlob instanceof Blob) {
+        setUserProfile({ ...userData, profilePicture: URL.createObjectURL(displayPictureBlob) });
+      } else {
+        console.error('Invalid display picture data:', displayPictureBlob);
+        setUserProfile({ ...userData });
+      }
+      setLoading(false);
+    })
+    .catch((error) => console.error('Error fetching user data:', error));
   }, [id]);
 
   const fetchUserPosts = async () => {
@@ -335,9 +346,13 @@ function UserProfile() {
     <div className="user-profile">
       <div className="user-info">
         <div className="profile-picture">
-          <Link to={`/user/${userProfile.id}/display-picture`} state={{ user }}>
-            <img src={userProfile.profilePicture ? URL.createObjectURL(userProfile.profilePicture) : blankImage} alt={`${userProfile.firstName}'s display picture`} />
-          </Link>
+          {userProfile.profilePicture ? (
+            <Link to={`/user/${userProfile.id}/display-picture`} state={{ user }}>
+              <img src={userProfile.profilePicture} alt={`${userProfile.firstName}'s display picture`} />
+            </Link>
+          ) : (
+            <img src={blankImage} alt={`Default blank profile picture`} />
+          )}
         </div>
         <h2>{`${userProfile.firstName} ${userProfile.lastName}`}</h2>
         <FriendButton userId={userProfile.id} />
@@ -354,16 +369,8 @@ function UserProfile() {
           {friendsList.length === 0 ? (
             <p>No friends added yet.</p>
           ) : (
-            friendsList.slice(0, 2).map((friend: { _id: number; profilePicture: File | null; firstName: string; lastName: string; }) => (             
-              <div key={friend._id} className="user-friend">
-                <Link to={`/user/${friend._id}`}>
-                  <img
-                    src={friend.profilePicture ? URL.createObjectURL(friend.profilePicture) : blankImage}
-                    alt={`${friend.firstName}'s profile`}
-                  />
-                  <p>{`${friend.firstName} ${friend.lastName}`}</p>
-                </Link>
-              </div>
+            friendsList.slice(0, 2).map((friend: { _id: string; firstName: string; lastName: string; }) => (             
+              <UserFriend key={friend._id} friend={friend} />
             ))
           )}
         </div>
@@ -378,7 +385,7 @@ function UserProfile() {
         ) : (
           userPosts.map((post) => (
             <Post
-              key={post._id} 
+              key={post._id}
               {...post}
               update={fetchUserPosts}
             />

@@ -4,6 +4,7 @@ import blankImage from '../images/blank.png';
 import { useAuthContext } from '../hooks/useAuthContext';
 import FriendButton from './FriendButton';
 import { UserCardProps } from '../types/types';
+import { fetchDisplayPicture } from '../helpers/helpers';
 
 const UserCard: React.FC<UserCardProps> = ({
   id,
@@ -15,12 +16,24 @@ const UserCard: React.FC<UserCardProps> = ({
 }) => {
   const { user } = useAuthContext();
   const isCurrentUser = user?.id === id;
+  const [displayPicture, setDisplayPicture] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const getProfilePicture = async () => {
+      if (profilePicture) {
+        const picture = await fetchDisplayPicture(id);
+        setDisplayPicture(picture);
+      }
+    };
+
+    getProfilePicture();
+  }, [id, profilePicture]);
 
   return (
     <div className={`user-card ${isCurrentUser ? 'current-user' : ''}`}>
       <Link to={`/user/${id}`}>
         <div className="user-card-display-picture">
-          <img src={profilePicture ? URL.createObjectURL(profilePicture) : blankImage} alt="User Display" />
+          <img src={displayPicture ? displayPicture : blankImage} alt="User Display" />
         </div>
       </Link>
       <div className="user-card-details">

@@ -69,7 +69,8 @@ const getUserProfile = async (req, res) => {
       id: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
-      dateOfBirth: user.dateOfBirth,
+      birthDay: user.birthDay,
+      birthMonth: user.birthMonth,
       hometown: user.hometown,
       occupation: user.occupation,
       profilePicture: user.profilePicture,
@@ -85,7 +86,7 @@ const getUserProfile = async (req, res) => {
 
 const updateUserProfile = async (req, res) => {
   const userId = req.params.id;
-  const { dateOfBirth, hometown, occupation, privateInfo } = req.body;
+  const { birthDay, birthMonth, hometown, occupation, privateInfo } = req.body;
 
   try {
     const user = await User.findById(userId);
@@ -103,7 +104,8 @@ const updateUserProfile = async (req, res) => {
       user.profilePicture = displayPictureId;
     }
 
-    user.dateOfBirth = dateOfBirth;
+    user.birthDay = birthDay;
+    user.birthMonth = birthMonth;
     user.hometown = hometown;
     user.occupation = occupation;
 
