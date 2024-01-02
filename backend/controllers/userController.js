@@ -73,7 +73,7 @@ const getUserProfile = async (req, res) => {
       birthMonth: user.birthMonth,
       hometown: user.hometown,
       occupation: user.occupation,
-      profilePicture: user.profilePicture,
+      displayPicture: user.displayPicture,
       visibility: user.visibility,
     };
 
@@ -101,7 +101,7 @@ const updateUserProfile = async (req, res) => {
 
       const displayPictureId = await displayPictureController.uploadDisplayPicture(userId, filename, buffer);
 
-      user.profilePicture = displayPictureId;
+      user.displayPicture = displayPictureId;
     }
 
     user.birthDay = birthDay;

@@ -12,6 +12,7 @@ router.get('/user/:userId/details', displayPictureController.getDisplayPictureDe
 // router.get('/:displayPictureId', displayPictureController.getDisplayPictureById);
 router.post('/:displayPictureId/comments', requireAuth, displayPictureController.addComment);
 router.delete('/:displayPictureId/comments/:commentId', requireAuth, displayPictureController.removeComment);
-router.post('/:displayPictureId/likes', requireAuth, displayPictureController.toggleLike);
+router.post('/:displayPictureId/like', displayPictureController.likeDisplayPicture);
+router.delete('/:displayPictureId/unlike', displayPictureController.unlikeDisplayPicture);
 
 module.exports = router;

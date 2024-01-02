@@ -13,6 +13,7 @@ import Login from './components/Login';
 import Register from './components/Register';
 import SearchPage from './components/SearchPage';
 import FriendPage from './components/FriendPage';
+import PostPage from './components/PostPage';
 
 function App() {
   const { user } = useAuthContext();
@@ -49,6 +50,10 @@ function App() {
             <Route
               path="user/:id/friends"
               element={user ? <FriendPage /> : <Navigate to='/login' />}
+            />
+            <Route
+              path="post/:id"
+              element={user ? <PostPage /> : <Navigate to='/login' />}
             />
             <Route
               path="/search"

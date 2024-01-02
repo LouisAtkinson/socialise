@@ -74,8 +74,7 @@ const hasPendingRequest = async (notifications, userId, type) => {
     if (
       notification &&
       notification.sender.equals(userId) &&
-      notification.type === type &&
-      !notification.isRead
+      notification.type === type
     ) {
       return true; 
     }
@@ -112,7 +111,6 @@ const sendFriendRequest = async (req, res) => {
         sender: loggedInObjectId,
         recipient: otherUserObjectId,
         type: 'friendRequest',
-        content: 'You have a new friend request!',
       });
 
       const savedNotification = await newNotification.save();
@@ -157,7 +155,7 @@ const acceptFriendRequest = async (req, res) => {
         (notificationId) => !notificationId.equals(friendRequestNotification._id)
       );
 
-      await Notification.findByIdAndRemove(friendRequestNotification._id);
+      await Notification.findByIdAndDelete(friendRequestNotification._id);
 
       loggedInUser.friends.push(otherUserObjectId);
       otherUser.friends.push(loggedInObjectId);
@@ -169,7 +167,6 @@ const acceptFriendRequest = async (req, res) => {
         sender: otherUserObjectId,
         recipient: loggedInObjectId,
         type: 'friendRequestAccepted',
-        content: 'Your friend request has been accepted.',
       });
 
       await friendRequestAcceptedNotification.save();
@@ -210,7 +207,7 @@ const denyFriendRequest = async (req, res) => {
         (notificationId) => !notificationId.equals(friendRequestNotification._id)
       );
 
-      await Notification.findByIdAndRemove(friendRequestNotification._id);
+      await Notification.findByIdAndDelete(friendRequestNotification._id);
 
       await loggedInUser.save();
 

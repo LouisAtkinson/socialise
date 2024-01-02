@@ -207,14 +207,14 @@ body {
   background-color: #0055ff;
 }
 
-.post {
+/* .post {
   margin: 20px 0;
   border: 1px solid #ccc;
   padding: 16px;
   border-radius: 4px;
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+} */
 
 .post-header {
   display: flex;
@@ -237,8 +237,16 @@ body {
   text-decoration: none;
 }
 
-.post-author, .comment-author {
+.post-author, .comment-author, .like-link, .remaining-likes {
   font-weight: 700;
+  text-decoration: none;
+}
+
+.comment-section {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 20px;
+  padding: 5px;
 }
 
 .comment-name-date {
@@ -246,7 +254,7 @@ body {
   gap: 10px;
 }
 
-.delete-post {
+.delete-post, .delete-notification-btn {
   background-color: #dc3545;
   color: #fff;
   border: none;
@@ -257,8 +265,22 @@ body {
   transition: background-color 0.3s ease;
 }
 
-.delete-post:hover {
+.delete-notification-btn {
+  font-size: 12px;
+  padding: 4px 4px;
+}
+
+.delete-post:hover, .delete-notification-btn:hover {
   background-color: #c82333;
+}
+
+.post-container {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .post-content {
@@ -294,6 +316,31 @@ body {
 
 .comments {
   margin-top: 10px;
+}
+
+.comments-container {
+  padding: 10px;
+  margin-top: 10px;
+}
+
+.show-more-comments-button, .submit-comment-btn {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.show-more-comments-button:hover, .submit-comment-btn:hover {
+  background-color: #0056b3;
+}
+
+.first-comment {
+  margin-top: 10px;
+  padding: 10px;
 }
 
 textarea {
@@ -459,7 +506,9 @@ textarea {
   position: absolute;
   top: 100%; 
   right: 0;
+  max-height: 200px;
   width: 250px;
+  overflow-y: auto;
   background-color: #fff;
   border: 1px solid #ccc;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -472,6 +521,27 @@ textarea {
   background-color: #007bff;
   color: #fff; 
   font-size: 16px;
+}
+
+.notification-buttons {
+  display: flex;
+  justify-content: space-evenly;
+  margin-top: 7px;
+  gap: 10px;
+}
+
+.mark-all-read,
+.clear-all {
+  background: none;
+  border: none;
+  color: #007bff;
+  cursor: pointer;
+  outline: none;
+}
+
+.mark-all-read:hover,
+.clear-all:hover {
+  text-decoration: underline;
 }
 
 .notifications-menu ul {
@@ -496,6 +566,42 @@ textarea {
 
 .notifications-menu strong {
   color: #007bff;
+}
+
+.notification {
+  color: black;
+}
+
+.notification-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  margin-right: -20px;
+}
+
+.notification-image {
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
+  border-radius: 50%;
+}
+
+.notification-text {
+  font-size: 15px;
+}
+
+.notification-text strong {
+  float: left;
+  margin-right: 4px;
+}
+
+.unread {
+  background-color: #dbe7ff;
 }
 
 .edit-profile-button, .save-changes-btn {
@@ -629,4 +735,32 @@ textarea {
 .friendship-actions p {
   margin: 0;
   font-weight: bold;
+}
+
+.display-picture img {
+  max-width: 400px; 
+  max-height: 400px;
+}
+
+.likes-popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+}
+
+.likes-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.likes-popup-content {
+  max-height: 300px;
+  overflow-y: auto;
 }

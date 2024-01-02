@@ -73,9 +73,7 @@ function Home() {
           },
           body: JSON.stringify({ 
             content: postContent, 
-            user: {
-              id: user.id
-            }
+            userId: user.id
           }),
         });
 

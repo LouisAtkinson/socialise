@@ -11,12 +11,31 @@ const notificationSchema = new mongoose.Schema({
     },
     type: {
       type: String,
-      enum: ['friendRequest', 'friendRequestAccepted', 'comment', 'like'],
+      enum: [
+        'friendRequest', 
+        'friendRequestAccepted', 
+        'postComment', 
+        'postLike', 
+        'commentLike', 
+        'displayPictureComment', 
+        'displayPictureLike'
+      ],
     },
-    content: String, 
     timestamp: {
       type: Date,
       default: Date.now,
+    },
+    postId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Post',
+    },
+    commentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Comment',
+    },
+    displayPictureId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'DisplayPicture',
     },
     isRead: {
       type: Boolean,

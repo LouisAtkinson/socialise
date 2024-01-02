@@ -49,8 +49,8 @@ const SearchPage: React.FC = () => {
         {currentUsers.map((user) => (
             <UserCard
                 key={user._id} 
-                id={user._id}
-                profilePicture={user.profilePicture}
+                _id={user._id}
+                displayPicture={user.displayPicture}
                 firstName={user.firstName}
                 lastName={user.lastName}
                 hometown={user.hometown || null}

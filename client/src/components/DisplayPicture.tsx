@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import blankImage from '../images/blank.png';
 import Comment from './Comment';
-import { CommentData } from '../types/types';
+import LikesSection from './LikeSection';
+import { CommentData, Like } from '../types/types';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
 import { fetchDisplayPicture } from '../helpers/helpers';
@@ -14,17 +15,18 @@ function DisplayPicture() {
   const [comment, setComment] = useState('');
   const [displayPicture, setDisplayPicture] = useState<string | null>(null);
   const [comments, setComments] = useState<CommentData[]>([]);
-  const [likes, setLikes] = useState<number>(0);
+  const [likes, setLikes] = useState<Like[]>([]);
   const [uploadDate, setUploadDate] = useState<Date | null>(null);
   const [displayPictureId, setDisplayPictureId] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<Boolean>(true);
 
   const location = useLocation();
   const userId = location.pathname.split('/')[2];
 
   const fetchDisplayPictureData = async () => {
     try {
-      const profilePicture = await fetchDisplayPicture(userId);
-      setDisplayPicture(profilePicture);
+      const displayPicture = await fetchDisplayPicture(userId);
+      setDisplayPicture(displayPicture);
     } catch (error) {
       console.error('Error fetching display picture:', error);
     }
@@ -36,6 +38,7 @@ function DisplayPicture() {
         setLikes(displayPictureData.likes.length);
         setUploadDate(displayPictureData.uploadDate);
         setDisplayPictureId(displayPictureData.displayPictureId);
+        setIsLoading(false);
       } else {
         console.error('Error fetching display picture details:', response.statusText);
       }
@@ -89,37 +92,45 @@ function DisplayPicture() {
   }, [userId]);
 
   return (
-    <div className="display-picture">
-      <img
-        src={displayPicture ? displayPicture : blankImage}
-        alt="Display Picture"
-      />
-      {isLiked ? (
-        <button onClick={handleLikeClick}>Unlike</button>
-      ) : (
-        <button onClick={handleLikeClick}>Like</button>
-      )}
-      <p>{likes} {likes === 1 ? 'like' : 'likes'}</p>
-      <textarea
-        placeholder="Add a comment..."
-        value={comment}
-        onChange={(e) => setComment(e.target.value)}
-      />
-      <button onClick={handleCommentSubmit}>Comment</button>
-      {comments.map((comment) => (
-        <Comment
-          key={comment._id}
-          _id={comment._id}
-          profilePicture={comment.author.profilePicture}
-          fullName={`${comment.author.firstName} ${comment.author.lastName}`}
-          datetime={comment.date}
-          content={comment.content}
-          parentId={displayPictureId}
-          update={fetchDisplayPictureData}
-          likes={comment.likes}
-          type={"displayPicture"}
-        />
-      ))}
+    <div>
+      {(isLoading) 
+        ? <h3>Loading...</h3> 
+        : <div className="display-picture">
+          <img
+            src={displayPicture ? displayPicture : blankImage}
+            alt="Display Picture"
+          />
+
+          <LikesSection likes={likes}/>
+
+          {isLiked ? (
+            <button onClick={handleLikeClick}>Unlike</button>
+          ) : (
+            <button onClick={handleLikeClick}>Like</button>
+          )}
+          <textarea
+            placeholder="Add a comment..."
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+          />
+          <button onClick={handleCommentSubmit}>Comment</button>
+          {comments.map((comment) => (
+            <Comment
+              key={comment._id}
+              _id={comment._id}
+              authorId={comment.author.id}
+              displayPicture={comment.author.displayPicture}
+              fullName={`${comment.author.firstName} ${comment.author.lastName}`}
+              datetime={comment.date}
+              content={comment.content}
+              parentId={displayPictureId}
+              update={fetchDisplayPictureData}
+              likes={comment.likes}
+              type={"displayPicture"}
+            />
+          ))}
+        </div>
+      }
     </div>
   );
 }

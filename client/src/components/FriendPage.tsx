@@ -47,7 +47,7 @@ function FriendPage() {
       ) : (
         <div className="friend-list">
           {friends.map((friend) => (
-            <UserCard key={friend.id} {...friend} />
+            <UserCard key={friend._id} {...friend} />
           ))}
         </div>
       )}

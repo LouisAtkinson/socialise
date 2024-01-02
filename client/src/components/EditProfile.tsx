@@ -13,7 +13,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
     birthMonth: currentUser.birthMonth || '',
     hometown: currentUser.hometown || '',
     occupation: currentUser.occupation || '',
-    profilePicture: currentUser.profilePicture || '',
+    displayPicture: currentUser.displayPicture || '',
     privateInfo: {
       dateOfBirth: !currentUser.visibility?.dateOfBirth || true,
       hometown: !currentUser.visibility?.hometown || true,
@@ -43,7 +43,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
             birthMonth: userData.birthMonth || '',
             hometown: userData.hometown || '',
             occupation: userData.occupation || '',
-            profilePicture: displayPicture || '',
+            displayPicture: displayPicture || '',
             privateInfo: {
               dateOfBirth: userData.visibility?.dateOfBirth || true,
               hometown: userData.visibility?.hometown || true,
@@ -91,7 +91,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
     if (file) {
       setFormState((prevFormState) => ({
         ...prevFormState,
-        profilePicture: file,
+        displayPicture: file,
       }));
     }
 
@@ -123,7 +123,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
         console.error('Failed to update user information', userInfoResponse);
       }
 
-      if (formState.profilePicture instanceof File) {
+      if (formState.displayPicture instanceof File) {
         const token = user?.token;
   
         if (!token) {
@@ -132,9 +132,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
         }
 
         const displayPictureFormData = new FormData();
-        displayPictureFormData.append('file', formState.profilePicture);
-
-        console.log(displayPictureFormData);
+        displayPictureFormData.append('file', formState.displayPicture);
   
         const displayPictureResponse = await fetch(`/api/display-pictures/${user.id}`, {
           method: 'POST',
@@ -170,10 +168,10 @@ function EditProfile({ currentUser }: EditProfileProps) {
       <form onSubmit={handleSubmit}>
         <div className="profile-picture-section">
           <img
-            src={formState.profilePicture !== null ? 
-              (typeof formState.profilePicture === 'string' ? 
-                formState.profilePicture : 
-                URL.createObjectURL(formState.profilePicture)
+            src={formState.displayPicture !== null ? 
+              (typeof formState.displayPicture === 'string' ? 
+                formState.displayPicture : 
+                URL.createObjectURL(formState.displayPicture)
               ) : 
               blankImage
             } alt="Display picture"

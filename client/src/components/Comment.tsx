@@ -5,8 +5,9 @@ import { useLogout } from '../hooks/useLogout';
 import { CommentProps } from '../types/types';
 import { formatDate } from '../helpers/helpers';
 import { Link } from 'react-router-dom';
+import LikesSection from './LikeSection';
 
-function Comment({ _id, profilePicture, fullName, datetime, content, likes, parentId, update, type }: CommentProps) {
+function Comment({ _id, authorId, displayPicture, fullName, datetime, content, likes, parentId, update, type }: CommentProps) {
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const [isLiked, setIsLiked] = React.useState<boolean>(false);
@@ -87,7 +88,7 @@ function Comment({ _id, profilePicture, fullName, datetime, content, likes, pare
     <div className="comment">
       <Link to={`/user/${_id}`}>
         <img
-          src={profilePicture ? profilePicture : blankImage}
+          src={displayPicture ? displayPicture : blankImage}
           alt={`${fullName}'s display picture`}
         />
       </Link>
@@ -98,35 +99,21 @@ function Comment({ _id, profilePicture, fullName, datetime, content, likes, pare
           </Link>
           <p>{formatDate(datetime)}</p>
         </div>
-        <p className="comment-content">{content}</p>    
+        <p className="comment-content">{content}</p>   
+        
+        <LikesSection likes={likes} />
+
         <div className="post-actions">
-        <button className="like-button" onClick={handleLikeClick}>
-          {isLiked ? 'Unlike' : 'Like'}
-        </button>
-        <p className="likes">
-          {likes.length === 1 && (
-            <>
-              <Link to={`/user/${likes[0]._id}`} style={{ color: 'blue' }}>
-                {likes[0].firstName} {likes[0].lastName}
-              </Link>{' '}
-              liked this
-            </>
-          )}
-          {likes.length > 1 && (
-            <>
-              <Link to={`/user/${likes[0]._id}`} style={{ color: 'blue' }}>
-                {likes[0].firstName} {likes[0].lastName}
-              </Link>{' '}
-              and{' '}
-              {likes.length - 1} {likes.length - 1 === 1 ? 'other' : 'others'} liked this
-            </>
-          )}
-        </p> 
-      </div>      
+          <button className="like-button" onClick={handleLikeClick}>
+            {isLiked ? 'Unlike' : 'Like'}
+          </button>
+        </div>      
       </div>
-      <button className="delete-comment" onClick={handleDeleteClick}>
-        Delete
-      </button>
+      {(authorId === user.id) &&
+        <button className="delete-comment" onClick={handleDeleteClick}>
+          Delete
+        </button>
+      }
     </div>
   );
 }

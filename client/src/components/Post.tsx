@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Comment from './Comment'; 
+import LikesSection from './LikeSection';
 import blankImage from '../images/blank.png';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
@@ -12,6 +13,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
   const { logout } = useLogout();
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [showComments, setShowComments] = useState<boolean>(false);
+  const [showCommentInput, setShowCommentInput] = useState<boolean>(false);
   const [newComment, setNewComment] = useState<string>('');
   const [authorProfilePicture, setAuthorProfilePicture] = useState<string | null>(null);
   const firstComment = comments?.length ? comments[0] : null;
@@ -21,7 +23,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
 
   React.useEffect(() => {
     setIsLiked(likes.some(like => like._id === user?.id));
-  }, [likes, user]);
+  }, [likes, user]);  
 
   React.useEffect(() => {
     const getProfilePicture = async () => {
@@ -31,6 +33,10 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
 
     getProfilePicture();
   }, [author._id]);
+
+  const handleCommentButtonClick = () => {
+    setShowCommentInput(!showCommentInput);
+  };
 
   const handleLikeClick = async () => {
     try {
@@ -132,91 +138,107 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
   };
 
   return (
-    <div className="post">
-      <div className="post-header">
-        <Link to={`/user/${author._id}`}>
-          <img
-            src={authorProfilePicture ? authorProfilePicture : blankImage}
-            alt={`${author.firstName}'s display picture`}
-          />
-        </Link>
-        <div className="post-info">
+    <div className="post-container">
+      <div className="post">
+        <div className="post-header">
           <Link to={`/user/${author._id}`}>
-            <p className='post-author'>{`${author.firstName} ${author.lastName}`}</p>
-          </Link>          
-          <p>{formatDate(date)}</p>
+            <img
+              src={authorProfilePicture ? authorProfilePicture : blankImage}
+              alt={`${author.firstName}'s display picture`}
+            />
+          </Link>
+          <div className="post-info">
+            <Link to={`/user/${author._id}`}>
+              <p className="post-author">{`${author.firstName} ${author.lastName}`}</p>
+            </Link>
+            <p>{formatDate(date)}</p>
+          </div>
+          {(author._id === user.id) && <button className="delete-post" onClick={handleDeleteClick}>
+            Delete
+          </button>}
         </div>
-        <button className="delete-post" onClick={handleDeleteClick}>
-          Delete
-        </button>
-      </div>
-      <p className="post-content">{content}</p>
+        <p className="post-content">{content}</p>
+
+        <LikesSection likes={likes}/>
   
-      {firstComment && (
-        <div className="first-comment">
-          <Comment
-            key={firstComment._id}
-            _id={firstComment._id}
-            profilePicture={authorProfilePicture}
-            fullName={`${firstComment.author.firstName} ${firstComment.author.lastName}`}
-            datetime={firstComment.date}
-            content={firstComment.content}
-            likes={firstComment.likes}
-            parentId={_id}
-            update={update}
-            type="Post"
-          />
+        <div className="post-actions">
+          <button className="like-button" onClick={handleLikeClick}>
+            {isLiked ? 'Unlike' : 'Like'}
+          </button>
+  
+          <button
+            className="comment-button"
+            onClick={handleCommentButtonClick}
+          >
+            Comment
+          </button>
         </div>
-      )}
-  
-      {remainingComments?.length > 0 && (
-        <button
-          className="show-more-comments-button"
-          onClick={() => setShowComments(!showComments)}
-        >
-          {showComments ? 'Hide Comments' : `Show ${remainingComments.length} More Comments`}
-        </button>
-      )}
-  
-      <div className="post-actions">
-        <button className="like-button" onClick={handleLikeClick}>
-          {isLiked ? 'Unlike' : 'Like'}
-        </button>
-  
-        <button
-          className="comment-button"
-          onClick={() => setShowComments(!showComments)}
-        >
-          Comment
-        </button>
       </div>
-  
-      {showComments && (
-        <div className="comments">
+
+      {showCommentInput && (
+        <div className="comments-container">
           <textarea
             placeholder="Add a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
           />
-          <button onClick={handleCommentSubmit}>Submit</button>
-          {remainingComments?.map((comment) => (
-            <Comment
-              key={comment._id}
-              _id={comment._id}
-              profilePicture={authorProfilePicture}
-              fullName={`${comment.author.firstName} ${comment.author.lastName}`}
-              datetime={comment.date}
-              content={comment.content}
-              likes={comment.likes}
-              parentId={_id}
-              update={update}
-              type="Post"
-            />
-          ))}
+          <button className='submit-comment-btn' onClick={handleCommentSubmit}>Submit</button>
         </div>
       )}
+
+      <div className={comments?.length > 0 ? 'comment-section' : ''}>
+        {(firstComment || showComments) && (
+          <div className="comments-container">
+            {firstComment && (
+              <div className="first-comment">
+                <Comment
+                  key={firstComment._id}
+                  _id={firstComment._id}
+                  authorId={firstComment.author.id}
+                  displayPicture={authorProfilePicture}
+                  fullName={`${firstComment.author.firstName} ${firstComment.author.lastName}`}
+                  datetime={firstComment.date}
+                  content={firstComment.content}
+                  likes={firstComment.likes}
+                  parentId={_id}
+                  update={update}
+                  type="Post"
+                />
+              </div>
+            )}
+
+            {showComments && remainingComments?.map((comment) => (
+              <Comment
+                key={comment._id}
+                _id={comment._id}
+                authorId={comment.author.id}
+                displayPicture={authorProfilePicture}
+                fullName={`${comment.author.firstName} ${comment.author.lastName}`}
+                datetime={comment.date}
+                content={comment.content}
+                likes={comment.likes}
+                parentId={_id}
+                update={update}
+                type="Post"
+              />
+            ))}
+          </div>
+        )}
+
+        {remainingComments?.length > 0 && (
+          <button
+            className="show-more-comments-button"
+            onClick={() => setShowComments(!showComments)}
+          >
+            {showComments
+              ? 'Hide Comments'
+              : `Show ${remainingComments.length} More Comments`}
+          </button>
+        )}
+      </div>
+      
     </div>
-  );  
-}
+  );
+}  
 
 export default Post;

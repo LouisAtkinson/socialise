@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { NotificationType } from '../types/types';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
+import blankImage from '../images/blank.png';
+import NotificationCard from './NotificationCard';
+import { fetchDisplayPicture } from '../helpers/helpers';
 
-const Notifications = () => {
+const NotificationPopup: React.FC = () => {
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const [notifications, setNotifications] = useState<NotificationType[]>();
-  const [unreadCount, setUnreadCount] = useState(2);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -40,7 +44,7 @@ const Notifications = () => {
     };
 
     fetchNotifications();
-  }, []);
+  }, [user, logout]);
 
   const deleteNotification = async (notificationId: string) => {
     try {
@@ -60,7 +64,7 @@ const Notifications = () => {
       if (response.ok) {
         setNotifications((prevNotifications) =>
           prevNotifications?.filter((notification: NotificationType) =>
-            notification.id !== notificationId
+            notification._id !== notificationId
           )
         );
         setUnreadCount((count) => Math.max(0, count - 1));
@@ -90,7 +94,7 @@ const Notifications = () => {
       if (response.ok) {
         setNotifications((prevNotifications) =>
           prevNotifications?.map((notification: NotificationType) =>
-            notification.id === notificationId
+            notification._id === notificationId
               ? { ...notification, isRead: true }
               : notification
           )
@@ -104,38 +108,99 @@ const Notifications = () => {
     }
   };
 
+  const markAllAsRead = async () => {
+    try {
+      const token = user?.token;
+  
+      if (!token) {
+        logout();
+        return;
+      }
+  
+      const response = await fetch(`/api/user/${user.id}/notifications/markAllAsRead`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (response.ok) {
+        setNotifications((prevNotifications) =>
+          prevNotifications?.map((notification: NotificationType) => ({
+            ...notification,
+            isRead: true,
+          }))
+        );
+        setUnreadCount(0);
+      } else {
+        console.error('Error deleting all notifications:', response.statusText);
+      }
+      
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+    }
+  };
+  
+  const clearAll = async () => {
+    try {
+      const token = user?.token;
+  
+      if (!token) {
+        logout();
+        return;
+      }
+  
+      const response = await fetch(`/api/user/${user.id}/notifications`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+  
+      if (response.ok) {
+        setNotifications([]);
+        setUnreadCount(0);
+      } else {
+        console.error('Error clearing all notifications:', response.statusText);
+      }
+    } catch (error) {
+      console.error('Error clearing all notifications:', error);
+    }
+  };
+  
+
   return (
     <div className="notifications-dropdown">
-      <div className="notifications-link">
+      <div className="notifications-link" onClick={() => setIsPopupOpen(!isPopupOpen)}>
         <span>Notifications</span>
         {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
-        {/* <span className="notification-count">2</span> */}
       </div>
-      <div className="notifications-menu">
-        <h3>Notifications</h3>
-        {notifications?.length === 0 ? (
-          <p>No new notifications</p>
-        ) : (
+      {isPopupOpen && (
+        <div className="notifications-menu">
+          <h3>Notifications</h3>
+          <div className="notification-buttons">
+            <button className="mark-all-read" onClick={markAllAsRead}>
+              Mark all as read
+            </button>
+            <button className="clear-all" onClick={clearAll}>
+              Clear all
+            </button>
+          </div>
           <ul>
             {notifications?.map((notification: NotificationType) => (
-              <li key={notification.id}>
-                {!notification.isRead ? (
-                  <strong>{notification.sender.firstName} {notification.sender.lastName}</strong>
-                ) : (
-                  `${notification.sender.firstName} ${notification.sender.lastName}`
-                )}{' '}
-                {notification.content}
-                {!notification.isRead && (
-                  <button onClick={() => markAsRead(notification.id)}>&times;</button>
-                )}
-                <button onClick={() => deleteNotification(notification.id)}>Delete</button>
-              </li>
+              <NotificationCard
+                key={notification._id}
+                notification={notification}
+                markAsRead={markAsRead}
+                deleteNotification={deleteNotification}
+              />
             ))}
           </ul>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default Notifications;
+export default NotificationPopup;

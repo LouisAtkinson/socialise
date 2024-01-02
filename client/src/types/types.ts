@@ -3,7 +3,7 @@ export interface PostData {
     content: string;
     author: {
       _id: string;
-      profilePicture: string | null;
+      displayPicture: string | null;
       firstName: string;
       lastName: string;
     };
@@ -17,7 +17,7 @@ export interface PostProps {
     content: string;
     author: {
       _id: string;
-      profilePicture: string | null;
+      displayPicture: string | null;
       firstName: string;
       lastName: string;
     };
@@ -31,7 +31,7 @@ export interface CommentData {
     _id: string;
     author: {
         id: string;
-        profilePicture: string | null;
+        displayPicture: string | null;
         firstName: string;
         lastName: string;
     };
@@ -42,7 +42,8 @@ export interface CommentData {
 
 export interface CommentProps {
     _id: string,
-    profilePicture: string | null;
+    authorId: string,
+    displayPicture: string | null;
     fullName: string;
     datetime: string;
     content: string;
@@ -56,6 +57,7 @@ export interface Like {
     _id: string;
     firstName: string;
     lastName: string;
+    displayPicture: string | null;
 }
 
 export interface UserProfileProps {
@@ -66,7 +68,7 @@ export interface UserProfileProps {
     birthMonth: string;
     hometown: string;
     occupation: string;
-    profilePicture: string | null;
+    displayPicture: string | null;
     visibility: {
         dateOfBirth: boolean;
         hometown: boolean;
@@ -91,8 +93,8 @@ export interface FriendButtonProps {
 }
 
 export interface UserCardProps {
-    id: string;
-    profilePicture: string | null;
+    _id: string;
+    displayPicture: string | null;
     firstName: string;
     lastName: string;
     hometown: string | null;
@@ -110,7 +112,7 @@ export interface EditProfileProps {
       birthMonth: string;
       hometown: string;
       occupation: string;
-      profilePicture: string;
+      displayPicture: string;
       visibility: {
         dateOfBirth: boolean;
         hometown: boolean;
@@ -135,7 +137,7 @@ export interface FormState {
     birthMonth: string;
     hometown: string;
     occupation: string;
-    profilePicture: string | null | File;
+    displayPicture: string | null | File;
     privateInfo: PrivateInfo;
     [key: string]: string | PrivateInfo | boolean | null | File;
 }
@@ -145,13 +147,30 @@ export interface PostFormProps {
 }
 
 export interface NotificationType {
-    id: string;
+    _id: string;
     sender: {
+      _id: string;
       firstName: string;
       lastName: string;
       displayPicture: string | null;
     };
-    type: string;
-    content: string;
+    type: string; // friendRequest, postLike, displayPictureLike, postComment, displayPictureComment, friendRequestAccepted
     isRead: boolean;
+    postId: string;
+    commentId: string;
+}
+
+export interface LikesSectionProps {
+    likes: Like[];
+  }
+
+export interface LikesPopupProps {
+    likes: Like[];
+    onClose: () => void;
+}
+
+export interface NotificationCardProps {
+    notification: NotificationType;
+    markAsRead: (notificationId: string) => void;
+    deleteNotification: (notificationId: string) => void;
 }

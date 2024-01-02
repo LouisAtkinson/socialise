@@ -6,6 +6,7 @@ const { requireAuth } = require('../middleware/requireAuth');
 router.use(requireAuth);
 
 router.get('/:userId', postController.getAllPosts);
+router.get('/post/:postId', postController.getOnePost);
 router.post('/', postController.addPost);
 router.delete('/:postId', postController.deletePost);
 router.post('/:postId/comments', postController.addComment);

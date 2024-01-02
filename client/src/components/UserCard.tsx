@@ -7,43 +7,43 @@ import { UserCardProps } from '../types/types';
 import { fetchDisplayPicture } from '../helpers/helpers';
 
 const UserCard: React.FC<UserCardProps> = ({
-  id,
-  profilePicture,
+  _id,
+  displayPicture,
   firstName,
   lastName,
   hometown,
   visibility,
 }) => {
   const { user } = useAuthContext();
-  const isCurrentUser = user?.id === id;
-  const [displayPicture, setDisplayPicture] = React.useState<string | null>(null);
+  const isCurrentUser = user?.id === _id;
+  const [userDisplayPicture, setUserDisplayPicture] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const getProfilePicture = async () => {
-      if (profilePicture) {
-        const picture = await fetchDisplayPicture(id);
-        setDisplayPicture(picture);
+      if (userDisplayPicture) {
+        const picture = await fetchDisplayPicture(_id);
+        setUserDisplayPicture(picture);
       }
     };
 
     getProfilePicture();
-  }, [id, profilePicture]);
+  }, [_id, userDisplayPicture]);
 
   return (
     <div className={`user-card ${isCurrentUser ? 'current-user' : ''}`}>
-      <Link to={`/user/${id}`}>
+      <Link to={`/user/${_id}`}>
         <div className="user-card-display-picture">
-          <img src={displayPicture ? displayPicture : blankImage} alt="User Display" />
+          <img src={userDisplayPicture ? userDisplayPicture : blankImage} alt="User Display" />
         </div>
       </Link>
       <div className="user-card-details">
-        <Link to={`/user/${id}`}>
+        <Link to={`/user/${_id}`}>
           <h3>{`${firstName} ${lastName}`}</h3>
         </Link>
-        {visibility.hometown && hometown && <p>Hometown: {hometown}</p>}
+        {visibility?.hometown && hometown && <p>Hometown: {hometown}</p>}
       </div>
       <div className="user-card-friendship-actions">
-        <FriendButton userId={id} />
+        <FriendButton userId={_id} />
       </div>
     </div>
   );

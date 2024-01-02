@@ -23,7 +23,7 @@ function UserProfile() {
     birthMonth: '',
     hometown: '',
     occupation: '',
-    profilePicture: null,
+    displayPicture: null,
     visibility: {
       dateOfBirth: false,
       hometown: false,
@@ -114,9 +114,8 @@ function UserProfile() {
       fetch(`/api/display-pictures/user/${id}`).then((response) => response.blob())
     ])
     .then(([userData, displayPictureBlob]) => {
-      console.log(displayPictureBlob)
-      if (displayPictureBlob instanceof Blob) {
-        setUserProfile({ ...userData, profilePicture: URL.createObjectURL(displayPictureBlob) });
+      if (displayPictureBlob instanceof Blob && !displayPictureBlob.type.startsWith('application/')) {
+        setUserProfile({ ...userData, displayPicture: URL.createObjectURL(displayPictureBlob) });
       } else {
         console.error('Invalid display picture data:', displayPictureBlob);
         setUserProfile({ ...userData });
@@ -346,9 +345,9 @@ function UserProfile() {
     <div className="user-profile">
       <div className="user-info">
         <div className="profile-picture">
-          {userProfile.profilePicture ? (
+          {userProfile.displayPicture ? (
             <Link to={`/user/${userProfile.id}/display-picture`} state={{ user }}>
-              <img src={userProfile.profilePicture} alt={`${userProfile.firstName}'s display picture`} />
+              <img src={userProfile.displayPicture} alt={`${userProfile.firstName}'s display picture`} />
             </Link>
           ) : (
             <img src={blankImage} alt={`Default blank profile picture`} />
