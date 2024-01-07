@@ -4,6 +4,7 @@ const DisplayPicture = require('../models/displayPicture');
 const multer = require('multer');
 const { GridFSBucket } = require('mongodb');
 const User = require('../models/user');
+const sharp = require('sharp');
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
@@ -22,9 +23,13 @@ connection.once('open', () => {
 
 exports.uploadDisplayPicture = async (req, res) => {
   try {
-    debugger;
     const { userId } = req.params;
     const { buffer, originalname } = req.file;
+
+    const compressedBuffer = await sharp(buffer)
+      .resize({ width: 800 })
+      .jpeg({ quality: 70 }) 
+      .toBuffer();
 
     const uploadStream = gfs.openUploadStream(originalname, {
       metadata: {
@@ -33,7 +38,7 @@ exports.uploadDisplayPicture = async (req, res) => {
       },
     });
 
-    uploadStream.write(buffer);
+    uploadStream.write(compressedBuffer);
     uploadStream.end();
 
     uploadStream.on('finish', async () => {
