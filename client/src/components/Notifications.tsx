@@ -6,6 +6,7 @@ import { useLogout } from '../hooks/useLogout';
 import blankImage from '../images/blank.png';
 import NotificationCard from './NotificationCard';
 import { fetchDisplayPicture } from '../helpers/helpers';
+import bellSvg from '../images/bell.svg';
 
 const NotificationPopup: React.FC = () => {
   const { user } = useAuthContext();
@@ -13,6 +14,20 @@ const NotificationPopup: React.FC = () => {
   const [notifications, setNotifications] = useState<NotificationType[]>();
   const [unreadCount, setUnreadCount] = useState(0);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -40,11 +55,13 @@ const NotificationPopup: React.FC = () => {
         }
       } catch (error) {
         console.error('Error fetching notifications:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchNotifications();
-  }, [user, logout]);
+  }, []);
 
   const deleteNotification = async (notificationId: string) => {
     try {
@@ -173,20 +190,32 @@ const NotificationPopup: React.FC = () => {
   return (
     <div className="notifications-dropdown">
       <div className="notifications-link" onClick={() => setIsPopupOpen(!isPopupOpen)}>
-        <span>Notifications</span>
+        {isMobile ? (
+          <span>
+            <img src={bellSvg} alt='Bell icon' />
+          </span>
+        ) : (
+          <span>Notifications</span>
+        )}
         {unreadCount > 0 && <span className="notification-count">{unreadCount}</span>}
       </div>
       {isPopupOpen && (
         <div className="notifications-menu">
           <h3>Notifications</h3>
-          <div className="notification-buttons">
-            <button className="mark-all-read" onClick={markAllAsRead}>
-              Mark all as read
-            </button>
-            <button className="clear-all" onClick={clearAll}>
-              Clear all
-            </button>
-          </div>
+          {isLoading ? (
+            <p className='notifications-loading'>Loading...</p>
+          ) : notifications?.length ?? 0 > 0 ? (
+            <div className="notification-buttons">
+              <button className="mark-all-read" onClick={markAllAsRead}>
+                Mark all as read
+              </button>
+              <button className="clear-all" onClick={clearAll}>
+                Clear all
+              </button>
+            </div>
+          ) : (
+            <p className='no-notifications'>No notifications</p>
+          )}
           <ul>
             {notifications?.map((notification: NotificationType) => (
               <NotificationCard

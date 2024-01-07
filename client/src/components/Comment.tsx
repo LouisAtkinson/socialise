@@ -97,7 +97,7 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
           <Link to={`/user/${_id}`}>
             <p className='comment-author'>{fullName}</p>
           </Link>
-          <p>{formatDate(datetime)}</p>
+          <p className='date'>{formatDate(datetime)}</p>
         </div>
         <p className="comment-content">{content}</p>   
         

@@ -25,7 +25,7 @@ function UserProfile() {
     occupation: '',
     displayPicture: null,
     visibility: {
-      dateOfBirth: false,
+      birthday: false,
       hometown: false,
       occupation: false
     }
@@ -353,8 +353,21 @@ function UserProfile() {
             <img src={blankImage} alt={`Default blank profile picture`} />
           )}
         </div>
+
         <h2>{`${userProfile.firstName} ${userProfile.lastName}`}</h2>
+
         <FriendButton userId={userProfile.id} />
+
+        {userProfile.visibility.birthday && userProfile.birthDay && userProfile.birthMonth && (
+          <p>Birthday: {`${userProfile.birthMonth} ${userProfile.birthDay}`}</p>
+        )}
+        {userProfile.visibility.hometown && userProfile.hometown && (
+          <p>Hometown: {userProfile.hometown}</p>
+        )}
+        {userProfile.visibility.occupation && userProfile.occupation && (
+          <p>Occupation: {userProfile.occupation}</p>
+        )}
+
         {isCurrentUserProfile() && (
           <Link to={`/user/${userProfile.id}/edit-profile`} state={{ user }}>
             <button className="edit-profile-button">Edit Profile</button>

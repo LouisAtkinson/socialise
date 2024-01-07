@@ -4,24 +4,46 @@ import Notifications from './Notifications';
 import { useLogout } from '../hooks/useLogout';
 import { useAuthContext } from '../hooks/useAuthContext';
 import SearchBar from './SearchBar';
+import MobileNav from './MobileNav';
 
 function Header() {
   const { user } = useAuthContext();
-  const {logout} = useLogout();
+  const { logout } = useLogout();
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
+
+  const handleMobileNavToggle = () => {
+    setIsMobileNavOpen(!isMobileNavOpen);
+  };
 
   return (
     <header className="header">
       <Link to="/">
         <h1>Socialise</h1>
       </Link>
-      <nav>
+      <div className="nav-container">
         {user ? (
           <>
-            <SearchBar />
-            <Link to="/">Home</Link>
-            <Notifications/>
-            <Link to={`/user/${user.id}`}>My Profile</Link>
-            <Link to="/login" onClick={logout}>Logout</Link>
+            <MobileNav isOpen={isMobileNavOpen} onClose={handleMobileNavToggle} />
+
+            <div className="mobile-notifications">
+              <Notifications/>
+            </div>
+            
+            <div className="burger-menu" onClick={handleMobileNavToggle}>
+              <div className="bar"></div>
+              <div className="bar"></div>
+              <div className="bar"></div>
+            </div>
+
+            <nav className="desktop-nav">
+              <SearchBar />
+              <Notifications />
+              <Link to="/">Home</Link>
+              <Link to={`/user/${user?.id}`}>My Profile</Link>
+              <Link to="/login" onClick={logout}>
+                Logout
+              </Link>
+            </nav>
           </>
         ) : (
           <>
@@ -29,7 +51,8 @@ function Header() {
             <Link to="/login">Login</Link>
           </>
         )}
-      </nav>
+        
+      </div>
     </header>
   );
 }

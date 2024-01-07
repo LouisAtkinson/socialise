@@ -30,7 +30,7 @@ export interface PostProps {
 export interface CommentData {
     _id: string;
     author: {
-        id: string;
+        _id: string;
         displayPicture: string | null;
         firstName: string;
         lastName: string;
@@ -70,7 +70,7 @@ export interface UserProfileProps {
     occupation: string;
     displayPicture: string | null;
     visibility: {
-        dateOfBirth: boolean;
+        birthday: boolean;
         hometown: boolean;
         occupation: boolean;
     };
@@ -114,7 +114,7 @@ export interface EditProfileProps {
       occupation: string;
       displayPicture: string;
       visibility: {
-        dateOfBirth: boolean;
+        birthday: boolean;
         hometown: boolean;
         occupation: boolean;
       };
@@ -127,7 +127,7 @@ export interface BirthdayFormProps {
 }
   
 export interface PrivateInfo {
-    dateOfBirth: boolean;
+    birthday: boolean;
     hometown: boolean;
     occupation: boolean;
 }
@@ -173,4 +173,9 @@ export interface NotificationCardProps {
     notification: NotificationType;
     markAsRead: (notificationId: string) => void;
     deleteNotification: (notificationId: string) => void;
+}
+
+export interface MobileNavProps {
+    isOpen: boolean;
+    onClose: () => void;
 }

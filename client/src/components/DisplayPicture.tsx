@@ -118,7 +118,7 @@ function DisplayPicture() {
             <Comment
               key={comment._id}
               _id={comment._id}
-              authorId={comment.author.id}
+              authorId={comment.author._id}
               displayPicture={comment.author.displayPicture}
               fullName={`${comment.author.firstName} ${comment.author.lastName}`}
               datetime={comment.date}

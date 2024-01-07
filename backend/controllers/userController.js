@@ -109,7 +109,7 @@ const updateUserProfile = async (req, res) => {
     user.hometown = hometown;
     user.occupation = occupation;
 
-    user.visibility.dateOfBirth = !privateInfo.dateOfBirth;
+    user.visibility.birthday = !privateInfo.birthday;
     user.visibility.hometown = !privateInfo.hometown;
     user.visibility.occupation = !privateInfo.occupation;
 

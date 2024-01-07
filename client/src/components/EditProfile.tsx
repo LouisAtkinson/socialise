@@ -15,7 +15,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
     occupation: currentUser.occupation || '',
     displayPicture: currentUser.displayPicture || '',
     privateInfo: {
-      dateOfBirth: !currentUser.visibility?.dateOfBirth || true,
+      birthday: !currentUser.visibility?.birthday || true,
       hometown: !currentUser.visibility?.hometown || true,
       occupation: !currentUser.visibility?.occupation || true,
     },
@@ -24,6 +24,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
   const [isSaving, setIsSaving] = useState(false);
   const [unsaved, setUnsaved] = useState(false);
   const [changesSaved, setChangesSaved] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const navigate = useNavigate();
   const { user } = useAuthContext();
@@ -45,7 +46,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
             occupation: userData.occupation || '',
             displayPicture: displayPicture || '',
             privateInfo: {
-              dateOfBirth: userData.visibility?.dateOfBirth || true,
+              birthday: userData.visibility?.birthday || true,
               hometown: userData.visibility?.hometown || true,
               occupation: userData.visibility?.occupation || true,
             },
@@ -93,6 +94,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
         ...prevFormState,
         displayPicture: file,
       }));
+      setSelectedFile(file);
     }
 
     setChangesSaved(false);
@@ -166,33 +168,46 @@ function EditProfile({ currentUser }: EditProfileProps) {
     <div className="edit-profile-container">
       <h2>Edit Profile</h2>
       <form onSubmit={handleSubmit}>
-        <div className="profile-picture-section">
-          <img
-            src={formState.displayPicture !== null ? 
-              (typeof formState.displayPicture === 'string' ? 
-                formState.displayPicture : 
-                URL.createObjectURL(formState.displayPicture)
-              ) : 
-              blankImage
-            } alt="Display picture"
-          />
-          <input type="file" accept="image/*" onChange={handleFileChange} />
-        </div>
-
-        <div className="form-group">
+      <div className="profile-picture-section">
+        <img
+          src={formState.displayPicture !== null ?
+            (typeof formState.displayPicture === 'string' ?
+              formState.displayPicture :
+              URL.createObjectURL(formState.displayPicture)
+            ) :
+            blankImage
+          } alt="Display picture"
+          className="profile-picture"
+        />
+        <label htmlFor="file-input" className="file-upload-btn">
+          Upload Picture
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="file-input"
+          id="file-input"
+        />
+        {selectedFile && (
+          <span className="selected-file-name">{selectedFile.name}</span>
+        )}
+      </div>
+  
+       <div className="form-group">
           <label>Date of Birth:</label>
           <BirthdayForm formState={formState} handleInputChange={handleInputChange} />
           <div className="checkbox-label">
             <input
               type="checkbox"
-              name="dateOfBirth"
-              checked={formState.privateInfo.dateOfBirth}
+              name="birthday"
+              checked={formState.privateInfo.birthday}
               onChange={handleInputChange}
             />
             <label>Private</label>
           </div>
         </div>
-
+  
         <div className="form-group">
           <label>Hometown:</label>
           <input
@@ -200,7 +215,8 @@ function EditProfile({ currentUser }: EditProfileProps) {
             name="hometown"
             value={formState.hometown || ''}
             onChange={handleInputChange}
-          />
+            className="text-input"
+          /> 
           <div className="checkbox-label">
             <input
               type="checkbox"
@@ -211,7 +227,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
             <label>Private</label>
           </div>
         </div>
-
+  
         <div className="form-group">
           <label>Occupation:</label>
           <input
@@ -219,6 +235,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
             name="occupation"
             value={formState.occupation}
             onChange={handleInputChange}
+            className="text-input"
           />
           <div className="checkbox-label">
             <input
@@ -230,19 +247,19 @@ function EditProfile({ currentUser }: EditProfileProps) {
             <label>Private</label>
           </div>
         </div>
-
-        <button 
-          className='save-changes-btn' 
+  
+        <button
+          className={(!isSaving && !changesSaved && unsaved) ? 'save-changes-btn' : 'save-changes-btn inactive'}
           type="submit"
           disabled={!unsaved || isSaving}
         >
-          {isSaving ? 'Saving...' : 'Save Changes'}
+          {isSaving ? 'Saving...' : ((changesSaved && !unsaved) ? 'Changes saved' : 'Save changes')}
         </button>
-
-        {changesSaved && <p className="changes-saved-msg">Changes saved</p>}
-
-        <button type="button" onClick={handleReturnToProfile}>
-          Return to Profile
+  
+        {/* {changesSaved && <p className="changes-saved-msg">Changes saved</p>} */}
+  
+        <button className='return-btn' type="button" onClick={handleReturnToProfile}>
+          Return to profile
         </button>
       </form>
     </div>

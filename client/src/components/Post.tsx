@@ -151,7 +151,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
             <Link to={`/user/${author._id}`}>
               <p className="post-author">{`${author.firstName} ${author.lastName}`}</p>
             </Link>
-            <p>{formatDate(date)}</p>
+            <p className='date'>{formatDate(date)}</p>
           </div>
           {(author._id === user.id) && <button className="delete-post" onClick={handleDeleteClick}>
             Delete
@@ -194,7 +194,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
                 <Comment
                   key={firstComment._id}
                   _id={firstComment._id}
-                  authorId={firstComment.author.id}
+                  authorId={firstComment.author._id}
                   displayPicture={authorProfilePicture}
                   fullName={`${firstComment.author.firstName} ${firstComment.author.lastName}`}
                   datetime={firstComment.date}
@@ -211,7 +211,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
               <Comment
                 key={comment._id}
                 _id={comment._id}
-                authorId={comment.author.id}
+                authorId={comment.author._id}
                 displayPicture={authorProfilePicture}
                 fullName={`${comment.author.firstName} ${comment.author.lastName}`}
                 datetime={comment.date}

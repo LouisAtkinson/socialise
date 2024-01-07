@@ -62,7 +62,7 @@ function Register() {
       <form className="register-form" onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="firstName" className="form-label">
-            First Name
+            First name
           </label>
           <input
             type="text"
@@ -76,7 +76,7 @@ function Register() {
         </div>
         <div className="form-group">
           <label htmlFor="lastName" className="form-label">
-            Last Name
+            Last name
           </label>
           <input
             type="text"
