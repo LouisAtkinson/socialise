@@ -20,26 +20,30 @@ const UserCard: React.FC<UserCardProps> = ({
 
   React.useEffect(() => {
     const getProfilePicture = async () => {
-      if (userDisplayPicture) {
-        const picture = await fetchDisplayPicture(_id);
-        setUserDisplayPicture(picture);
-      }
+      const picture = await fetchDisplayPicture(_id);
+      setUserDisplayPicture(picture);
     };
 
     getProfilePicture();
   }, [_id, userDisplayPicture]);
 
   return (
-    <div className={`user-card ${isCurrentUser ? 'current-user' : ''}`}>
+    <div className='user-card'>
       <Link to={`/user/${_id}`}>
         <div className="user-card-display-picture">
           <img src={userDisplayPicture ? userDisplayPicture : blankImage} alt="User Display" />
         </div>
       </Link>
       <div className="user-card-details">
-        <Link to={`/user/${_id}`}>
-          <h3>{`${firstName} ${lastName}`}</h3>
-        </Link>
+      <div>
+        <h3 className='user-card-name'>
+          <Link to={`/user/${_id}`} className='user-link'>
+            {`${firstName} ${lastName}`}
+          </Link>
+          {isCurrentUser && <span className='you-text'>(you)</span>}
+        </h3>
+      </div>
+        
         {visibility?.hometown && hometown && <p>Hometown: {hometown}</p>}
       </div>
       <div className="user-card-friendship-actions">

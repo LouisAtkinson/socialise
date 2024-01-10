@@ -376,7 +376,7 @@ function UserProfile() {
       </div>
 
       <div className="friends-section">
-        <h3>Friends</h3>
+        <h3 className="section-title">Friends</h3>
         <div className="friends-list">
           {friendsList.length === 0 ? (
             <p>No friends added yet.</p>
@@ -386,7 +386,7 @@ function UserProfile() {
             ))
           )}
         </div>
-        <Link to="friends">See All Friends</Link>
+        <Link to="friends" className="see-all-link">See All Friends</Link>
       </div>
 
       <div className="post-section">

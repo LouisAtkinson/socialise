@@ -158,6 +158,7 @@ export interface NotificationType {
     isRead: boolean;
     postId: string;
     commentId: string;
+    displayPictureId: string;
 }
 
 export interface LikesSectionProps {

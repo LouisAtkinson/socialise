@@ -7,6 +7,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const checkFriendshipStatus = async () => {
@@ -33,7 +34,9 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
               ? 'pending' 
             : data.hasPendingRequestFromOtherUser
               ? 'received'
-            : null);        } else {
+            : null);
+          setLoading(false);        
+          } else {
           console.error('Error checking friendship status:', response.statusText);
         }
       } catch (error) {
@@ -151,6 +154,10 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
       console.error('Error removing friend:', error);
     }
   };
+
+  if (loading) return (
+    <></>
+  );
 
   return (
     <div>

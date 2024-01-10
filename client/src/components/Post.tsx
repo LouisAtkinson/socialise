@@ -212,7 +212,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
                 key={comment._id}
                 _id={comment._id}
                 authorId={comment.author._id}
-                displayPicture={authorProfilePicture}
+                displayPicture={comment.author.displayPicture}
                 fullName={`${comment.author.firstName} ${comment.author.lastName}`}
                 datetime={comment.date}
                 content={comment.content}

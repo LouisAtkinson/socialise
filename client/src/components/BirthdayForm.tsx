@@ -13,11 +13,12 @@ const BirthdayForm = ({formState, handleInputChange}: BirthdayFormProps) => {
     };
   
     return (
-      <>
+      <div className="select-container">
         <select
           name="birthMonth"
           value={formState.birthMonth || ''}
           onChange={handleInputChange}
+          className="select-input"
         >
           <option value="">Month</option>
           {monthsArray.map((month, index) => (
@@ -26,12 +27,13 @@ const BirthdayForm = ({formState, handleInputChange}: BirthdayFormProps) => {
             </option>
           ))}
         </select>
-  
+
         <select
           name="birthDay"
           value={formState.birthDay || ''}
           onChange={handleInputChange}
           disabled={!formState.birthMonth}
+          className="select-input"
         >
           <option value="">Day</option>
           {formState.birthMonth &&
@@ -41,7 +43,7 @@ const BirthdayForm = ({formState, handleInputChange}: BirthdayFormProps) => {
               </option>
             ))}
         </select>
-      </>
+      </div>
     );
   };
   

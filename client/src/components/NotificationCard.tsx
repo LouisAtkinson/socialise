@@ -3,8 +3,10 @@ import { Link } from 'react-router-dom';
 import { NotificationType, NotificationCardProps } from '../types/types';
 import { fetchDisplayPicture } from '../helpers/helpers';
 import blankImage from '../images/blank.png';
+import { useAuthContext } from '../hooks/useAuthContext';
 
 const NotificationCard: React.FC<NotificationCardProps> = ({ notification, markAsRead, deleteNotification }) => {
+  const { user } = useAuthContext();
   const [displayPicture, setDisplayPicture] = useState<string | null>(null);
 
   useEffect(() => {
@@ -82,7 +84,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, markA
         )}
 
         {notification.type === 'displayPictureComment' && (
-          <Link to={`/user/${notification.sender._id}/display-picture`}>
+          <Link to={`/user/${user.id}/display-picture`}>
             <div className="notification-content">
               <img
                 src={displayPicture || blankImage}
@@ -118,7 +120,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, markA
         )}
 
         {notification.type === 'displayPictureLike' && (
-          <Link to={`/user/${notification.sender._id}/display-picture`}>
+          <Link to={`/user/${user.id}/display-picture`}>
             <div className="notification-content">
               <img
                 src={displayPicture || blankImage}

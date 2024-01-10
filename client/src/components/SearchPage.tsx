@@ -9,6 +9,7 @@ const SearchPage: React.FC = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const usersPerPage = 20;
+  const totalPages = Math.ceil(users.length / usersPerPage);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -58,13 +59,20 @@ const SearchPage: React.FC = () => {
             />        
         ))}
       </div>
-      <div className="pagination">
-        {Array.from({ length: Math.ceil(users.length / usersPerPage) }).map((_, index) => (
-          <button key={index} onClick={() => paginate(index + 1)}>
-            {index + 1}
-          </button>
-        ))}
-      </div>
+      {(totalPages < 2) ? <></> : 
+        <div className="pagination">
+          {Array.from({ length: Math.ceil(users.length / usersPerPage) }).map((_, index) => (
+            <button
+              key={index}
+              onClick={() => paginate(index + 1)}
+              className={currentPage === index + 1 ? 'active' : ''}
+            >
+              {index + 1}
+            </button>
+          ))}
+        </div>
+      }
+      
     </div>
   );
 };

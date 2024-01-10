@@ -59,46 +59,60 @@ function Login() {
   };
 
   return (
-    <div className="login-container">
-      <h2 className="login-title">Login</h2>
-      <form className="login-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="email" className="form-label">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={email}
-            onChange={handleChange}
-            className="form-input"
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="password" className="form-label">
-            Password
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={password}
-            onChange={handleChange}
-            className="form-input"
-            required
-          />
-        </div>
-        <button type="submit" className="login-button">
-          Login
-        </button>
-        {error && <div className='error'>{error}</div>}
-      </form>
-      <p className="login-register-text">
-        Don't have an account? <Link to="/register">Register</Link>
-      </p>
-    </div>
+    <div>
+      <div className="introduction-container">
+        <h2 className="introduction-title">Hello and welcome!</h2>
+        <br/>
+        <p>
+          This Facebook-inspired social media site was built using Typescript and React on the front-end, and Express with MongoDB on the back-end.
+        </p>
+        <br/>
+        <p>
+          A ready-made user is provided, however feel free to create your own account if you wish.
+          You can also check out the source code on <a href="https://github.com/LouisAtkinson/socialise" target="_blank" rel="noopener noreferrer">GitHub</a> to see how it was built.
+        </p>
+      </div>
+      <div className="login-container">
+        <h2 className="login-title">Login</h2>
+        <form className="login-form" onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={email}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">
+              Password
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={password}
+              onChange={handleChange}
+              className="form-input"
+              required
+            />
+          </div>
+          <button type="submit" className="login-button">
+            Login
+          </button>
+          {error && <div className='error'>{error}</div>}
+        </form>
+        <p className="login-register-text">
+          Don't have an account? <Link to="/register">Register</Link>
+        </p>
+      </div>
+    </div> 
   );
 }
 

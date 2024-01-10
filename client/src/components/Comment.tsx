@@ -3,7 +3,7 @@ import blankImage from '../images/blank.png';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { useLogout } from '../hooks/useLogout';
 import { CommentProps } from '../types/types';
-import { formatDate } from '../helpers/helpers';
+import { formatDate, fetchDisplayPicture } from '../helpers/helpers'; 
 import { Link } from 'react-router-dom';
 import LikesSection from './LikeSection';
 
@@ -12,6 +12,16 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
   const { logout } = useLogout();
   const [isLiked, setIsLiked] = React.useState<boolean>(false);
   const [likesCount, setLikesCount] = React.useState<number>(likes.length);
+  const [authorProfilePicture, setAuthorProfilePicture] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    const getProfilePicture = async () => {
+      const picture = await fetchDisplayPicture(authorId);
+      setAuthorProfilePicture(picture);
+    };
+
+    getProfilePicture();
+  }, [authorId]);
 
   React.useEffect(() => {
     setIsLiked(likes.some(like => like._id === user?.id));
@@ -86,15 +96,15 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
   
   return (
     <div className="comment">
-      <Link to={`/user/${_id}`}>
+      <Link to={`/user/${authorId}`}>
         <img
-          src={displayPicture ? displayPicture : blankImage}
+          src={authorProfilePicture ? authorProfilePicture : blankImage}
           alt={`${fullName}'s display picture`}
         />
       </Link>
       <div className="comment-info">
         <div className='comment-name-date'>
-          <Link to={`/user/${_id}`}>
+          <Link to={`/user/${authorId}`}>
             <p className='comment-author'>{fullName}</p>
           </Link>
           <p className='date'>{formatDate(datetime)}</p>

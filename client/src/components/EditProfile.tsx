@@ -25,6 +25,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
   const [unsaved, setUnsaved] = useState(false);
   const [changesSaved, setChangesSaved] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   const navigate = useNavigate();
   const { user } = useAuthContext();
@@ -51,6 +52,8 @@ function EditProfile({ currentUser }: EditProfileProps) {
               occupation: userData.visibility?.occupation || true,
             },
           });
+
+          setLoading(false);
         } else {
           console.error('Failed to fetch user information');
         }
@@ -167,103 +170,121 @@ function EditProfile({ currentUser }: EditProfileProps) {
   return (
     <div className="edit-profile-container">
       <h2>Edit Profile</h2>
-      <form onSubmit={handleSubmit}>
-      <div className="profile-picture-section">
-        <img
-          src={formState.displayPicture !== null ?
-            (typeof formState.displayPicture === 'string' ?
-              formState.displayPicture :
-              URL.createObjectURL(formState.displayPicture)
-            ) :
-            blankImage
-          } alt="Display picture"
-          className="profile-picture"
-        />
-        <label htmlFor="file-input" className="file-upload-btn">
-          Upload Picture
-        </label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleFileChange}
-          className="file-input"
-          id="file-input"
-        />
-        {selectedFile && (
-          <span className="selected-file-name">{selectedFile.name}</span>
-        )}
-      </div>
-  
-       <div className="form-group">
-          <label>Date of Birth:</label>
-          <BirthdayForm formState={formState} handleInputChange={handleInputChange} />
-          <div className="checkbox-label">
-            <input
-              type="checkbox"
-              name="birthday"
-              checked={formState.privateInfo.birthday}
-              onChange={handleInputChange}
+      {loading ? (
+        <h3>Loading...</h3>
+      ) : (
+        <form onSubmit={handleSubmit}>
+          <div className="profile-picture-section">
+            <img
+              src={
+                formState.displayPicture !== null
+                  ? typeof formState.displayPicture === 'string'
+                    ? formState.displayPicture
+                    : URL.createObjectURL(formState.displayPicture)
+                  : blankImage
+              }
+              alt="Display picture"
+              className="profile-picture"
             />
-            <label>Private</label>
-          </div>
-        </div>
-  
-        <div className="form-group">
-          <label>Hometown:</label>
-          <input
-            type="text"
-            name="hometown"
-            value={formState.hometown || ''}
-            onChange={handleInputChange}
-            className="text-input"
-          /> 
-          <div className="checkbox-label">
+            <label htmlFor="file-input" className="file-upload-btn">
+              Upload Picture
+            </label>
             <input
-              type="checkbox"
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="file-input"
+              id="file-input"
+            />
+            {selectedFile && (
+              <span className="selected-file-name">{selectedFile.name}</span>
+            )}
+          </div>
+  
+          <div className="form-group">
+            <label>Date of Birth:</label>
+            <BirthdayForm
+              formState={formState}
+              handleInputChange={handleInputChange}
+            />
+            <div className="checkbox-label">
+              <input
+                type="checkbox"
+                name="birthday"
+                checked={!formState.privateInfo.birthday}
+                onChange={handleInputChange}
+              />
+              <label>Private</label>
+            </div>
+          </div>
+  
+          <div className="form-group">
+            <label>Hometown:</label>
+            <input
+              type="text"
               name="hometown"
-              checked={formState.privateInfo.hometown}
+              value={formState.hometown || ''}
               onChange={handleInputChange}
+              className="text-input"
             />
-            <label>Private</label>
+            <div className="checkbox-label">
+              <input
+                type="checkbox"
+                name="hometown"
+                checked={!formState.privateInfo.hometown}
+                onChange={handleInputChange}
+              />
+              <label>Private</label>
+            </div>
           </div>
-        </div>
   
-        <div className="form-group">
-          <label>Occupation:</label>
-          <input
-            type="text"
-            name="occupation"
-            value={formState.occupation}
-            onChange={handleInputChange}
-            className="text-input"
-          />
-          <div className="checkbox-label">
+          <div className="form-group">
+            <label>Occupation:</label>
             <input
-              type="checkbox"
+              type="text"
               name="occupation"
-              checked={formState.privateInfo.occupation}
+              value={formState.occupation}
               onChange={handleInputChange}
+              className="text-input"
             />
-            <label>Private</label>
+            <div className="checkbox-label">
+              <input
+                type="checkbox"
+                name="occupation"
+                checked={!formState.privateInfo.occupation}
+                onChange={handleInputChange}
+              />
+              <label>Private</label>
+            </div>
           </div>
-        </div>
   
-        <button
-          className={(!isSaving && !changesSaved && unsaved) ? 'save-changes-btn' : 'save-changes-btn inactive'}
-          type="submit"
-          disabled={!unsaved || isSaving}
-        >
-          {isSaving ? 'Saving...' : ((changesSaved && !unsaved) ? 'Changes saved' : 'Save changes')}
-        </button>
+          <button
+            className={
+              !isSaving && !changesSaved && unsaved
+                ? 'save-changes-btn'
+                : 'save-changes-btn inactive'
+            }
+            type="submit"
+            disabled={!unsaved || isSaving}
+          >
+            {isSaving
+              ? 'Saving...'
+              : changesSaved && !unsaved
+              ? 'Changes saved'
+              : 'Save changes'}
+          </button>
   
-        {/* {changesSaved && <p className="changes-saved-msg">Changes saved</p>} */}
-  
-        <button className='return-btn' type="button" onClick={handleReturnToProfile}>
-          Return to profile
-        </button>
-      </form>
+          <button
+            className="return-btn"
+            type="button"
+            onClick={handleReturnToProfile}
+          >
+            Return to profile
+          </button>
+        </form>
+      )}
     </div>
-  );
+  );  
 }
 
 export default EditProfile;

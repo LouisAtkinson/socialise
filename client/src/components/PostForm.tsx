@@ -4,7 +4,7 @@ import { PostFormProps } from '../types/types';
 function PostForm({ onSubmit }: PostFormProps) {
   const [newPost, setNewPost] = useState('');
 
-  const handlePostChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePostChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setNewPost(e.target.value);
   };
 
@@ -17,11 +17,10 @@ function PostForm({ onSubmit }: PostFormProps) {
 
   return (
     <div className="post-form">
-      <input
-        type="text"
+      <textarea
         placeholder="Write a post..."
         value={newPost}
-        onChange={handlePostChange}
+        onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handlePostChange(e)}
       />
       <button onClick={handlePostSubmit}>Post</button>
     </div>
