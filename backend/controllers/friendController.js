@@ -111,6 +111,7 @@ const sendFriendRequest = async (req, res) => {
         sender: loggedInObjectId,
         recipient: otherUserObjectId,
         type: 'friendRequest',
+        timestamp: new Date(),
       });
 
       const savedNotification = await newNotification.save();

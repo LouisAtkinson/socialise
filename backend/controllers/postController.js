@@ -32,8 +32,10 @@ const getAllPosts = async (req, res) => {
             path: 'likes',
             select: 'id firstName lastName displayPicture',
           },
-        ]
+        ],
+        options: { sort: { date: 1 } }
       })
+      .sort({ date: -1 });
 
     res.status(200).json(posts);
   } catch (error) {
@@ -66,8 +68,6 @@ const getOnePost = async (req, res) => {
           },
         ]
       })
-
-      console.log(posts)
 
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
@@ -146,6 +146,7 @@ const addComment = async (req, res) => {
         type: 'postComment',
         content: `${req.body.user.firstName} ${req.body.user.lastName} has commented on your post.`,
         postId: postId,
+        timestamp: new Date(),
       });
 
       const savedNotification = await newNotification.save();
@@ -216,6 +217,7 @@ const likePost = async (req, res) => {
         recipient: post.author.id,
         type: 'commentLike',
         postId: postId,
+        timestamp: new Date(),
       });
 
       const savedNotification = await newNotification.save();
@@ -293,6 +295,7 @@ const likeComment = async (req, res) => {
         recipient: commentAuthorId,
         type: 'commentLike',
         postId: postId,
+        timestamp: new Date(),
       });
 
       const savedNotification = await newNotification.save();

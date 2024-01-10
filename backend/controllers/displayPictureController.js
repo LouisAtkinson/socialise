@@ -63,7 +63,7 @@ exports.getDisplayPictureByUserId = async (req, res) => {
     const displayPictureId = await getDisplayPictureIdByUserId(userId);
 
     if (!displayPictureId) {
-      return res.status(404).json({ error: 'Display picture not found for the user' });
+      return res.status(200).json({ message: 'User does not have a display picture' });
     }
 
     const downloadStream = gfs.openDownloadStream(displayPictureId);
@@ -110,7 +110,7 @@ exports.getDisplayPictureDetails = async (req, res, next) => {
       .populate('likes');
 
     if (!displayPicture) {
-      return res.status(404).json({ message: 'User does not have a display picture' });
+      return res.status(200).json({ message: 'User does not have a display picture' });
     }
 
     res.status(200).json({
@@ -156,6 +156,7 @@ exports.addComment = async (req, res) => {
         recipient: displayPicture.userId,
         type: 'displayPictureComment',
         displayPictureId: displayPictureId,
+        timestamp: new Date(),
       });
 
       const savedNotification = await newNotification.save();
@@ -208,6 +209,7 @@ exports.likeDisplayPicture = async (req, res) => {
         recipient: displayPicture.userId,
         type: 'displayPictureLike',
         displayPictureId: displayPictureId,
+        timestamp: new Date(),
       });
 
       const savedNotification = await newNotification.save();

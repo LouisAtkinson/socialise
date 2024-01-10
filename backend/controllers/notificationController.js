@@ -6,9 +6,9 @@ const getNotifications = async (req, res) => {
   try {
     const { userId } = req.params;
     const notifications = await Notification.find({ recipient: userId })
-      .sort({ createdAt: 'desc' })
+      .sort({ timestamp: -1 })
       .populate('sender', 'id firstName lastName displayPicture')
-      .select('isRead type');
+      .select('isRead type postId commentId displayPictureId');
     res.json(notifications);
   } catch (error) {
     console.error('Error getting notifications:', error);
