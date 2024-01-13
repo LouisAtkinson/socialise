@@ -30,7 +30,7 @@ function Register() {
     setError(null);
 
     try {
-      const response = await fetch('/api/user/register', {
+      const response = await fetch('https://socialise-seven.vercel.app/api/user/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

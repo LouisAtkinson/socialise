@@ -87,7 +87,7 @@ function UserProfile() {
         return;
       }
   
-      const response = await fetch(`/api/posts/${postId}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/posts/${postId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -113,8 +113,8 @@ function UserProfile() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/user/${id}`).then((response) => response.json()),
-      fetch(`/api/display-pictures/user/${id}`).then((response) => response.blob())
+      fetch(`https://socialise-seven.vercel.app/api/user/${id}`).then((response) => response.json()),
+      fetch(`https://socialise-seven.vercel.app/api/display-pictures/user/${id}`).then((response) => response.blob())
     ])
     .then(([userData, displayPictureBlob]) => {
       if (displayPictureBlob instanceof Blob && !displayPictureBlob.type.startsWith('application/')) {
@@ -137,7 +137,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`/api/posts/user/${id}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/posts/user/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -181,7 +181,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`/api/friends/status/${user?.id}/${id}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/status/${user?.id}/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -211,7 +211,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`/api/friends/add/${user?.id}/${id}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/add/${user?.id}/${id}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -238,7 +238,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`/api/friends/accept/${user?.id}/${id}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/accept/${user?.id}/${id}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -265,7 +265,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`/api/friends/deny/${user?.id}/${id}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/deny/${user?.id}/${id}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -292,7 +292,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`/api/friends/remove/${user?.id}/${id}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/remove/${user?.id}/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -319,7 +319,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`/api/friends/all/${id}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/all/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

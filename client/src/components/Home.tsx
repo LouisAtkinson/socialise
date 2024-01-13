@@ -21,7 +21,7 @@ function Home() {
         return;
       }
 
-      const response = await fetch(`/api/posts/${user.id}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/posts/${user.id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ function Home() {
           logout();
           return;
         }
-        const response = await fetch('/api/posts', {
+        const response = await fetch('https://socialise-seven.vercel.app/api/posts', {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

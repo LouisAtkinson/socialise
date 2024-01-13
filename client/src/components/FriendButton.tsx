@@ -24,7 +24,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
           return;
         }
 
-        const response = await fetch(`/api/friends/status/${user?.id}/${userId}`, {
+        const response = await fetch(`https://socialise-seven.vercel.app/api/friends/status/${user?.id}/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -61,7 +61,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
         return;
       }
 
-      const response = await fetch(`/api/friends/add/${user?.id}/${userId}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/add/${user?.id}/${userId}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -88,7 +88,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
         return;
       }
 
-      const response = await fetch(`/api/friends/accept/${user?.id}/${userId}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/accept/${user?.id}/${userId}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -115,7 +115,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
         return;
       }
 
-      const response = await fetch(`/api/friends/deny/${user?.id}/${userId}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/deny/${user?.id}/${userId}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -142,7 +142,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
         return;
       }
 
-      const response = await fetch(`/api/friends/remove/${user?.id}/${userId}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/remove/${user?.id}/${userId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

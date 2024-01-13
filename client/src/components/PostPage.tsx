@@ -22,7 +22,7 @@ function PostPage() {
           return;
         }
 
-        const response = await fetch(`/api/posts/post/${id}`, {
+        const response = await fetch(`https://socialise-seven.vercel.app/api/posts/post/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

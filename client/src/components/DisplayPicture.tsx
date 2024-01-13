@@ -37,7 +37,7 @@ function DisplayPicture() {
       console.error('Error fetching display picture:', error);
     }
     try {
-      const response = await fetch(`/api/display-pictures/user/${userId}/details`);
+      const response = await fetch(`https://socialise-seven.vercel.app/api/display-pictures/user/${userId}/details`);
       if (response.ok) {
         const displayPictureData = await response.json();
         setComments(displayPictureData.comments);
@@ -102,7 +102,7 @@ function DisplayPicture() {
           return;
         }
 
-        const response = await fetch(`/api/display-pictures/${userId}/comments`, {
+        const response = await fetch(`https://socialise-seven.vercel.app/api/display-pictures/${userId}/comments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

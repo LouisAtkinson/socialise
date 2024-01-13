@@ -23,7 +23,7 @@ function FriendPage() {
           return;
         }
         
-        const response = await fetch(`/api/friends/all/${id}`, {
+        const response = await fetch(`https://socialise-seven.vercel.app/api/friends/all/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },

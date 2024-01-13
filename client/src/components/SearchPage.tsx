@@ -22,7 +22,7 @@ const SearchPage: React.FC = () => {
     const fetchUsers = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/user/search/${searchQuery}`);
+        const response = await fetch(`https://socialise-seven.vercel.app/api/user/search/${searchQuery}`);
         if (response.ok) {
           setLoading(false);
           const data = await response.json();

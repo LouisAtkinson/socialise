@@ -39,7 +39,7 @@ const NotificationPopup: React.FC = () => {
           return;
         }
 
-        const response = await fetch(`/api/user/${user.id}/notifications`, {
+        const response = await fetch(`https://socialise-seven.vercel.app/api/user/${user.id}/notifications`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -72,7 +72,7 @@ const NotificationPopup: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`/api/notifications/${notificationId}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -102,7 +102,7 @@ const NotificationPopup: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`/api/notifications/${notificationId}/markAsRead`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/notifications/${notificationId}/markAsRead`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -134,7 +134,7 @@ const NotificationPopup: React.FC = () => {
         return;
       }
   
-      const response = await fetch(`/api/user/${user.id}/notifications/markAllAsRead`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/user/${user.id}/notifications/markAllAsRead`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -168,7 +168,7 @@ const NotificationPopup: React.FC = () => {
         return;
       }
   
-      const response = await fetch(`/api/user/${user.id}/notifications`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/user/${user.id}/notifications`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,

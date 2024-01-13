@@ -34,7 +34,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
   React.useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`/api/user/${currentUser.id}`);
+        const response = await fetch(`https://socialise-seven.vercel.app/api/user/${currentUser.id}`);
         if (response.ok) {
           const userData = await response.json();
           
@@ -109,7 +109,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
     try {
       setIsSaving(true);
 
-      const userInfoResponse = await fetch(`/api/user/${currentUser.id}`, {
+      const userInfoResponse = await fetch(`https://socialise-seven.vercel.app/api/user/${currentUser.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
         const displayPictureFormData = new FormData();
         displayPictureFormData.append('file', formState.displayPicture);
   
-        const displayPictureResponse = await fetch(`/api/display-pictures/${user.id}`, {
+        const displayPictureResponse = await fetch(`https://socialise-seven.vercel.app/api/display-pictures/${user.id}`, {
           method: 'POST',
           body: displayPictureFormData,
           headers: {

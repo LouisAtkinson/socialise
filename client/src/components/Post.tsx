@@ -82,7 +82,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
         return;
       }
 
-      const response = await fetch(`/api/posts/${_id}`, {
+      const response = await fetch(`https://socialise-seven.vercel.app/api/posts/${_id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -109,7 +109,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
           return;
         }
   
-        const response = await fetch(`/api/posts/${_id}/comments`, {
+        const response = await fetch(`https://socialise-seven.vercel.app/api/posts/${_id}/comments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

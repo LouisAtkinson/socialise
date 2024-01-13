@@ -14,7 +14,7 @@ export const formatDate = (rawDate: string): string => {
 
 export const fetchDisplayPicture = async (userId: string) => {
   try {
-    const response = await fetch(`/api/display-pictures/user/${userId}`);
+    const response = await fetch(`https://socialise-seven.vercel.app/api/display-pictures/user/${userId}`);
     if (response.ok) {
       const contentType = response.headers.get('content-type');
       
