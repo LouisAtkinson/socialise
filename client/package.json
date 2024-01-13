@@ -41,6 +41,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://socialise-seven.vercel.app",
-  "homepage": "."
+  "proxy": "https://socialise-seven.vercel.app"
 }
