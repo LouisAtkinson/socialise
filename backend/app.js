@@ -16,9 +16,9 @@ app.use(morgan('combined'));
 // app.use(bodyParser.json());
 app.use(cors(
   {
-    origin: "https://socialise-seven.vercel.app",
-    methods: ["POST", "GET"],
-    credentials: true
+    origin: 'https://socialise-lz3f.vercel.app',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
   }
 ));
 app.use(express.json({ limit: '100mb' }));
