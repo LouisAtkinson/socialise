@@ -16,7 +16,7 @@ app.use(morgan('combined'));
 // app.use(bodyParser.json());
 app.use(cors(
   {
-    origin: 'https://socialise-lz3f.vercel.app',
+    origin: ['https://socialise-lz3f.vercel.app', 'http://localhost:3000'],    // origin: 'https://socialise-lz3f.vercel.app',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
   }
