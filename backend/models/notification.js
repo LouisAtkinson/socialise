@@ -18,7 +18,9 @@ const notificationSchema = new mongoose.Schema({
         'postLike', 
         'commentLike', 
         'displayPictureComment', 
-        'displayPictureLike'
+        'displayPictureLike',
+        'displayPictureCommentLike',
+        'postFromFriend'
       ],
     },
     timestamp: {

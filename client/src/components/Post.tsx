@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Comment from './Comment'; 
 import LikesSection from './LikeSection';
 import blankImage from '../images/blank.png';
@@ -8,7 +8,7 @@ import { CommentData, Like, PostProps } from '../types/types';
 import { Link } from 'react-router-dom';
 import { formatDate, fetchDisplayPicture } from '../helpers/helpers';
 
-function Post({ _id, content, author, date, likes, comments, update }: PostProps) {  
+function Post({ _id, content, author, recipient, date, likes, comments, update }: PostProps) {  
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -21,18 +21,18 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
 
   const [likesCount, setLikesCount] = useState<number>(likes.length);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setIsLiked(likes.some(like => like._id === user?.id));
-  }, [likes, user]);  
+  }, [likes, user]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const getProfilePicture = async () => {
-      const picture = await fetchDisplayPicture(author._id);
-      setAuthorProfilePicture(picture);
+      const authorPicture = await fetchDisplayPicture(author._id);
+      setAuthorProfilePicture(authorPicture);
     };
 
     getProfilePicture();
-  }, [author._id]);
+  }, [author._id, recipient]);
 
   const handleCommentButtonClick = () => {
     setShowCommentInput(!showCommentInput);
@@ -57,7 +57,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          user: { id: user.id },
+          user: { id: user?.id },
         }),
       });
   
@@ -118,7 +118,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
           body: JSON.stringify({ 
             content: newComment, 
             user: {
-              id: user.id
+              id: user?.id
             } }),
         });
   
@@ -148,14 +148,27 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
             />
           </Link>
           <div className="post-info">
+          <div className='comment-name-date'>
             <Link to={`/user/${author._id}`}>
               <p className="post-author">{`${author.firstName} ${author.lastName}`}</p>
             </Link>
             <p className='date'>{formatDate(date)}</p>
           </div>
-          {(author._id === user.id) && <button className="delete-post" onClick={handleDeleteClick}>
-            Delete
-          </button>}
+            
+            {recipient && (
+              <>
+                <span className="recipient-arrow">{' > '}</span>
+                <Link to={`/user/${recipient._id}`}>
+                  <p className="post-recipient">{`${recipient.firstName} ${recipient.lastName}`}</p>
+                </Link>
+              </>
+            )}
+          </div>
+          {author._id === user?.id || (recipient && recipient._id === user?.id) ? (
+            <button className="delete-post" onClick={handleDeleteClick}>
+              Delete
+            </button>
+          ) : null}
         </div>
         <p className="post-content">{content}</p>
 
@@ -202,7 +215,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
                   likes={firstComment.likes}
                   parentId={_id}
                   update={update}
-                  type="Post"
+                  type="post"
                 />
               </div>
             )}
@@ -219,7 +232,7 @@ function Post({ _id, content, author, date, likes, comments, update }: PostProps
                 likes={comment.likes}
                 parentId={_id}
                 update={update}
-                type="Post"
+                type="post"
               />
             ))}
           </div>

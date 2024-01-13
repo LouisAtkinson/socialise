@@ -48,14 +48,18 @@ function UserProfile() {
         logout();
         return;
       }
-  
-      const response = await fetch(`/api/posts`, {
+
+      const postEndpoint = isCurrentUserProfile()
+        ? '/api/posts'
+        : `/api/posts/${userProfile.id}`; 
+
+      const response = await fetch(postEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ userId: id, content: postContent }),
+        body: JSON.stringify({ userId: user.id, content: postContent }),
       });
   
       if (!response.ok) {
@@ -68,7 +72,7 @@ function UserProfile() {
       }
   
       const data = await response.json();
-      setUserPosts([...userPosts, data]);
+      fetchUserPosts();
     } catch (error) {
       console.error('Error adding post:', error);
     }
@@ -108,7 +112,6 @@ function UserProfile() {
   };
 
   useEffect(() => {
-    setLoading(true);
     Promise.all([
       fetch(`/api/user/${id}`).then((response) => response.json()),
       fetch(`/api/display-pictures/user/${id}`).then((response) => response.blob())
@@ -120,13 +123,13 @@ function UserProfile() {
         console.error('Invalid display picture data:', displayPictureBlob);
         setUserProfile({ ...userData });
       }
-      setLoading(false);
     })
     .catch((error) => console.error('Error fetching user data:', error));
   }, [id]);
 
   const fetchUserPosts = async () => {
     try {
+
       const token = user?.token; 
 
       if (!token) {
@@ -134,7 +137,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`/api/posts/${user.id}`, {
+      const response = await fetch(`/api/posts/user/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -151,8 +154,8 @@ function UserProfile() {
       }
 
       const data = await response.json();
-      const userPosts = data.filter((post: PostProps) => post.author._id === id);
-      setUserPosts(userPosts);
+      setUserPosts(data);
+      setLoading(false);
     } catch (error) {
       console.error('Error fetching user posts:', error);
     }

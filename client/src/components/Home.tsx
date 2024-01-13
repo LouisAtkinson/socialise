@@ -10,6 +10,7 @@ function Home() {
   const { logout } = useLogout();
   const [posts, setPosts] = useState<PostData[]>([]);
   const [newPost, setNewPost] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(true);
 
   const fetchPosts = async () => {
     try {
@@ -39,6 +40,7 @@ function Home() {
     }
 
     const data = await response.json();
+    setLoading(false);
 
     if (data.error) {
       console.error('Error from server:', data.error);
@@ -93,18 +95,21 @@ function Home() {
   return (
     <div className="home">
       <h2>Home</h2>
-      <PostForm onSubmit={handlePostSubmit} />
+      <PostForm onSubmit={handlePostSubmit}/>
       <div className="post-list">
-        {posts && posts.length === 0 ? (
-          <p>No posts yet. When you or your friends make posts, you will see them here!</p>
-        ) : (
-          posts.map((post) => (
-            <Post
-              key={post._id}
-              {...post}
-              update={fetchPosts}
-            />
-          ))
+        {loading && <h3>Loading...</h3>}
+        {!loading && (
+          posts && posts.length === 0 ? (
+            <p>No posts yet. When you or your friends make posts, you will see them here!</p>
+          ) : (
+            posts.map((post) => (
+              <Post
+                key={post._id}
+                {...post}
+                update={fetchPosts}
+              />
+            ))
+          )
         )}
       </div>
     </div>

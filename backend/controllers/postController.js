@@ -12,10 +12,74 @@ const getAllPosts = async (req, res) => {
     if (!user) {
       return res.status(404).json({ error: 'User not found' });
     }
+
     const friends = user.friends;
 
-    const posts = await Post.find({ $or: [{ author: userId }, { author: { $in: friends } }] })
+    const posts = await Post.find({
+      $or: [
+        { author: userId },
+        {
+          $and: [
+            { author: { $in: friends } },
+            { recipient: { $exists: false } },
+          ],
+        },
+        {
+          $and: [
+            { author: { $in: friends } },
+            {
+              $or: [
+                { recipient: userId },
+                { recipient: { $in: friends } },
+              ],
+            },
+          ],
+        },
+      ],
+    })
       .populate('author', 'id firstName lastName displayPicture')
+      .populate('recipient', 'id firstName lastName')
+      .populate({
+        path: 'likes',
+        select: 'id firstName lastName displayPicture',
+      })
+      .populate({
+        path: 'comments',
+        select: 'date likes content author',
+        populate: [
+          {
+            path: 'author',
+            select: 'id firstName lastName displayPicture',
+          },
+          {
+            path: 'likes',
+            select: 'id firstName lastName displayPicture',
+          },
+        ],
+        options: { sort: { date: 1 } },
+      })
+      .sort({ date: -1 });
+
+    res.status(200).json(posts);
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+
+const getUserPosts = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const posts = await Post.find({ $or: [{ author: userId, recipient: { $exists: false } }, { recipient: userId }] })
+      .populate('author', 'id firstName lastName displayPicture')
+      .populate('recipient', 'id firstName lastName')
       .populate({
         path: 'likes',
         select: 'id firstName lastName displayPicture',
@@ -39,7 +103,7 @@ const getAllPosts = async (req, res) => {
 
     res.status(200).json(posts);
   } catch (error) {
-    console.error('Error fetching posts:', error);
+    console.error('Error fetching user posts:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
@@ -89,6 +153,48 @@ const addPost = async (req, res) => {
       content,
       date: new Date(),
     });
+
+    res.status(201).json(newPost);
+  } catch (error) {
+    console.error('Error adding post:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+const postToFriend = async (req, res) => {
+  try {
+    const { content, userId } = req.body;
+    const recipientId = req.params.recipientId;
+
+    console.log(userId, recipientId);
+
+    const newPost = await Post.create({
+      author: userId,
+      content,
+      recipient: recipientId,
+      date: new Date(),
+    });
+
+    const postId = newPost._id;
+
+    const recipientUser = await User.findById(recipientId);
+
+    if (!recipientUser) {
+      return res.status(404).json({ error: 'Recipient user not found' });
+    }
+
+    const newNotification = await Notification.create({
+      sender: userId,
+      recipient: recipientId,
+      type: 'postFromFriend',
+      postId: postId,
+      timestamp: new Date(),
+    });
+
+    const savedNotification = await newNotification.save();
+
+    recipientUser.notifications.push(savedNotification._id);
+    await recipientUser.save();
 
     res.status(201).json(newPost);
   } catch (error) {
@@ -162,8 +268,6 @@ const addComment = async (req, res) => {
   }
 };
 
-  
-
 const deleteComment = async (req, res) => {
   try {
     const postId = req.params.postId;
@@ -215,7 +319,7 @@ const likePost = async (req, res) => {
       const newNotification = await Notification.create({
         sender: userId,
         recipient: post.author.id,
-        type: 'commentLike',
+        type: 'postLike',
         postId: postId,
         timestamp: new Date(),
       });
@@ -285,11 +389,9 @@ const likeComment = async (req, res) => {
     comment.likes.push(userId);
     await comment.save();
 
-
-
     const commentAuthorId = comment.author;
 
-    if (commentAuthorId !== userId) {
+    if (commentAuthorId.toString() !== userId) {
       const newNotification = await Notification.create({
         sender: userId,
         recipient: commentAuthorId,
@@ -348,8 +450,10 @@ const unlikeComment = async (req, res) => {
 
 module.exports = {
     getAllPosts,
+    getUserPosts,
     getOnePost,
     addPost,
+    postToFriend,
     deletePost,
     addComment,
     deleteComment,
