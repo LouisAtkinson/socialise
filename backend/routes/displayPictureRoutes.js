@@ -10,9 +10,11 @@ router.post('/:userId', requireAuth, upload.single('file'), displayPictureContro
 router.get('/user/:userId', displayPictureController.getDisplayPictureByUserId);
 router.get('/user/:userId/details', displayPictureController.getDisplayPictureDetails);
 // router.get('/:displayPictureId', displayPictureController.getDisplayPictureById);
-router.post('/:displayPictureId/comments', requireAuth, displayPictureController.addComment);
-router.delete('/:displayPictureId/comments/:commentId', requireAuth, displayPictureController.removeComment);
-router.post('/:displayPictureId/like', displayPictureController.likeDisplayPicture);
-router.delete('/:displayPictureId/unlike', displayPictureController.unlikeDisplayPicture);
+router.post('/:userId/comments', displayPictureController.addComment);
+router.delete('/:displayPictureId/comments/:commentId', displayPictureController.removeComment);
+router.post('/:userId/like', displayPictureController.likeDisplayPicture);
+router.delete('/:userId/unlike', displayPictureController.unlikeDisplayPicture);
+router.post('/:displayPictureId/comments/:commentId/like', displayPictureController.likeComment);
+router.delete('/:displayPictureId/comments/:commentId/unlike',displayPictureController.unlikeComment);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Comment = require('../models/comment');
 const DisplayPicture = require('../models/displayPicture');
+const Notification = require('../models/notification');
 const multer = require('multer');
 const { GridFSBucket } = require('mongodb');
 const User = require('../models/user');
@@ -21,7 +22,7 @@ connection.once('open', () => {
   }
 });
 
-exports.uploadDisplayPicture = async (req, res) => {
+const uploadDisplayPicture = async (req, res) => {
   try {
     const { userId } = req.params;
     const { buffer, originalname } = req.file;
@@ -57,7 +58,7 @@ exports.uploadDisplayPicture = async (req, res) => {
   }
 };
 
-exports.getDisplayPictureByUserId = async (req, res) => {
+const getDisplayPictureByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
     const displayPictureId = await getDisplayPictureIdByUserId(userId);
@@ -67,6 +68,8 @@ exports.getDisplayPictureByUserId = async (req, res) => {
     }
 
     const downloadStream = gfs.openDownloadStream(displayPictureId);
+
+    res.setHeader('Content-Type', 'image/jpeg');
 
     downloadStream.on('data', (chunk) => {
       res.write(chunk);
@@ -95,7 +98,7 @@ async function getDisplayPictureIdByUserId(userId) {
   }
 }
 
-exports.getDisplayPictureDetails = async (req, res, next) => {
+const getDisplayPictureDetails = async (req, res, next) => {
   const { userId } = req.params;
 
   try {
@@ -106,8 +109,24 @@ exports.getDisplayPictureDetails = async (req, res, next) => {
     }
 
     const displayPicture = await DisplayPicture.findOne({ userId: user._id })
-      .populate('comments')
-      .populate('likes');
+      .populate({
+        path: 'likes',
+        select: 'id firstName lastName displayPicture',
+      })
+      .populate({
+        path: 'comments',
+        select: 'date likes content author',
+        populate: [
+          {
+            path: 'author',
+            select: 'id firstName lastName displayPicture',
+          },
+          {
+            path: 'likes',
+            select: 'id firstName lastName displayPicture',
+          },
+        ]
+      })
 
     if (!displayPicture) {
       return res.status(200).json({ message: 'User does not have a display picture' });
@@ -118,6 +137,12 @@ exports.getDisplayPictureDetails = async (req, res, next) => {
       uploadDate: displayPicture.uploadDate,
       comments: displayPicture.comments,
       likes: displayPicture.likes,
+      user: {
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        fullName: `${user.firstName} ${user.lastName}`,
+      },
     });
   } catch (error) {
     console.error('Error fetching user display picture details:', error);
@@ -125,13 +150,13 @@ exports.getDisplayPictureDetails = async (req, res, next) => {
   }
 };
 
-exports.addComment = async (req, res) => {
+const addComment = async (req, res) => {
   try {
     const userId = req.body.user.id;
-    const displayPictureId = req.params.displayPictureId;
     const { content } = req.body;
+    const displayPictureOwnerId = req.params.userId;
 
-    const displayPicture = await DisplayPicture.findById(displayPictureId);
+    const displayPicture = await DisplayPicture.findOne({ userId: displayPictureOwnerId });
 
     if (!displayPicture) {
       return res.status(404).json({ error: 'Display picture not found' });
@@ -142,7 +167,7 @@ exports.addComment = async (req, res) => {
       author: userId,
       content,
       date: new Date(),
-      displayPictureId: displayPictureId,
+      displayPictureId: displayPicture._id,
     });
 
     const savedComment = await newComment.save();
@@ -150,12 +175,12 @@ exports.addComment = async (req, res) => {
     displayPicture.comments.push(savedComment._id);
     await displayPicture.save();
 
-    if (displayPicture.userId !== userId) {
+    if (displayPictureOwnerId !== userId) {
       const newNotification = await Notification.create({
         sender: userId,
         recipient: displayPicture.userId,
         type: 'displayPictureComment',
-        displayPictureId: displayPictureId,
+        displayPictureId: displayPicture._id,
         timestamp: new Date(),
       });
 
@@ -172,25 +197,41 @@ exports.addComment = async (req, res) => {
   }
 };
 
-exports.removeComment = async (req, res) => {
+const removeComment = async (req, res) => {
   try {
-    const { displayPictureId, commentId } = req.params;
-    const { userId } = req.user;
+    const displayPictureId = req.params.displayPictureId;
+    const commentId = req.params.commentId;
 
-    await removeComment(displayPictureId, commentId, userId);
+    const displayPicture = await DisplayPicture.findById(displayPictureId);
 
-    res.json({ message: 'Comment removed successfully' });
+    if (!displayPicture) {
+      return res.status(404).json({ error: 'Display picture not found' });
+    }
+
+    const commentIndex = displayPicture.comments.findIndex(
+      (comment) => comment._id.toString() === commentId
+    );
+
+    if (commentIndex === -1) {
+      return res.status(404).json({ error: 'Comment not found or unauthorized' });
+    }
+
+    displayPicture.comments.splice(commentIndex, 1);
+    await displayPicture.save();
+
+    res.status(204).end();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error('Error deleting comment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
-exports.likeDisplayPicture = async (req, res) => {
+const likeDisplayPicture = async (req, res) => {
   try {
-    const displayPictureId = req.params.displayPictureId;
     const userId = req.body.user.id;
+    const displayPictureOwnerId = req.params.userId;
 
-    const displayPicture = await DisplayPicture.findById(displayPictureId);
+    const displayPicture = await DisplayPicture.findOne({ userId: displayPictureOwnerId });
 
     if (!displayPicture) {
       return res.status(404).json({ error: 'Display picture not found' });
@@ -203,12 +244,12 @@ exports.likeDisplayPicture = async (req, res) => {
     displayPicture.likes.push(userId);
     await displayPicture.save();
 
-    if (displayPicture.userId !== userId) {
+    if (displayPictureOwnerId !== userId) {
       const newNotification = await Notification.create({
         sender: userId,
         recipient: displayPicture.userId,
         type: 'displayPictureLike',
-        displayPictureId: displayPictureId,
+        displayPictureId: displayPicture._id,
         timestamp: new Date(),
       });
 
@@ -226,12 +267,12 @@ exports.likeDisplayPicture = async (req, res) => {
   }
 };
 
-exports.unlikeDisplayPicture = async (req, res) => {
+const unlikeDisplayPicture = async (req, res) => {
   try {
-    const displayPictureId = req.params.displayPictureId;
     const userId = req.body.user.id;
+    const displayPictureOwnerId = req.params.userId;
 
-    const displayPicture = await DisplayPicture.findById(displayPictureId);
+    const displayPicture = await DisplayPicture.findOne({ userId: displayPictureOwnerId });
 
     if (!displayPicture) {
       return res.status(404).json({ error: 'Display picture not found' });
@@ -251,4 +292,100 @@ exports.unlikeDisplayPicture = async (req, res) => {
     console.error('Error removing like:', error);
     res.status(500).json({ error: 'Internal Server Error' });
   }
+};
+
+const likeComment = async (req, res) => {
+  try {
+    const displayPictureId = req.params.displayPictureId;
+    const commentId = req.params.commentId;
+    const userId = req.body.user.id;
+
+    const displayPicture = await DisplayPicture.findById(displayPictureId).populate('comments');
+
+    if (!displayPicture) {
+      return res.status(404).json({ error: 'Display picture not found' });
+    }
+
+    const comment = displayPicture.comments.find(commentObjectId => commentObjectId.equals(commentId));
+
+    if (!comment) {
+      return res.status(404).json({ error: 'Comment not found' });
+    }
+
+    if (comment.likes.includes(userId)) {
+      return res.status(400).json({ error: 'Comment already liked' });
+    }
+
+    comment.likes.push(userId);
+    await comment.save();
+
+    const commentAuthorId = comment.author;
+
+    if (commentAuthorId.toString() !== userId) {
+      const newNotification = await Notification.create({
+        sender: userId,
+        recipient: commentAuthorId,
+        type: 'displayPictureCommentLike',
+        displayPictureId: displayPictureId,
+        timestamp: new Date(),
+      });
+
+      const savedNotification = await newNotification.save();
+
+      const commentAuthor = await User.findById(commentAuthorId);
+      commentAuthor.notifications.push(savedNotification._id);
+      await commentAuthor.save();
+    }
+
+    res.status(200).json({ message: 'Comment liked successfully' });
+  } catch (error) {
+    console.error('Error liking comment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+const unlikeComment = async (req, res) => {
+  try {
+    const displayPictureId = req.params.displayPictureId;
+    const commentId = req.params.commentId;
+    const userId = req.body.user.id;
+
+    const displayPicture = await DisplayPicture.findById(displayPictureId).populate('comments');
+
+    if (!displayPicture) {
+      return res.status(404).json({ error: 'Display picture not found' });
+    }
+
+    const comment = displayPicture.comments.find(commentObjectId => commentObjectId.equals(commentId));
+
+    if (!comment) {
+      return res.status(404).json({ error: 'Comment not found' });
+    }
+
+    const likeIndex = comment.likes.indexOf(userId);
+
+    if (likeIndex === -1) {
+      return res.status(400).json({ error: 'Comment not liked' });
+    }
+
+    comment.likes.splice(likeIndex, 1);
+    await comment.save();
+
+    res.status(200).json({ message: 'Like removed from comment successfully' });
+  } catch (error) {
+    console.error('Error removing like from comment:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+module.exports = {
+  uploadDisplayPicture,
+  getDisplayPictureByUserId,
+  getDisplayPictureDetails,
+  addComment,
+  removeComment,
+  likeDisplayPicture,
+  unlikeDisplayPicture,
+  likeComment,
+  unlikeComment,
 };

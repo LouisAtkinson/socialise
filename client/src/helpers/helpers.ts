@@ -16,8 +16,14 @@ export const fetchDisplayPicture = async (userId: string) => {
   try {
     const response = await fetch(`/api/display-pictures/user/${userId}`);
     if (response.ok) {
-      const displayPictureBlob = await response.blob();
-      return displayPictureBlob instanceof Blob ? URL.createObjectURL(displayPictureBlob) : null;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.startsWith('image')) {
+        const displayPictureBlob = await response.blob();
+        return displayPictureBlob instanceof Blob ? URL.createObjectURL(displayPictureBlob) : null;
+      } else {
+        return null;
+      }
     } else {
       console.error('Error fetching display picture:', response.statusText);
       return null;
