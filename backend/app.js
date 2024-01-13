@@ -16,7 +16,7 @@ app.use(morgan('combined'));
 // app.use(bodyParser.json());
 app.use(cors(
   {
-    origin: ["https://socialise-seven.vercel.app/"],
+    origin: ["https://socialise-seven.vercel.app"],
     methods: ["POST", "GET"],
     credentials: true
   }
