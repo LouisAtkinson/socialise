@@ -4,8 +4,8 @@ import { useAuthContext } from '../hooks/useAuthContext';
 
 function Login() {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: 'JohnFoobar-DEMO@gmail.com',
+    password: 'Johnfoobar1!',
   });
 
   const [loading, setLoading] = useState(false);

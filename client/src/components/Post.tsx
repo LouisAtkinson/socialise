@@ -82,7 +82,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/posts/${_id}`, {
+      const response = await fetch(`/api/posts/${_id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -109,7 +109,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
           return;
         }
   
-        const response = await fetch(`https://socialise-seven.vercel.app/api/posts/${_id}/comments`, {
+        const response = await fetch(`/api/posts/${_id}/comments`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -140,36 +140,39 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
   return (
     <div className="post-container">
       <div className="post">
-        <div className="post-header">
-          <Link to={`/user/${author._id}`}>
-            <img
-              src={authorProfilePicture ? authorProfilePicture : blankImage}
-              alt={`${author.firstName}'s display picture`}
-            />
-          </Link>
-          <div className="post-info">
-          <div className='comment-name-date'>
-            <Link to={`/user/${author._id}`}>
-              <p className="post-author">{`${author.firstName} ${author.lastName}`}</p>
-            </Link>
-            <p className='date'>{formatDate(date)}</p>
+      <div className="post-header">
+        <Link to={`/user/${author._id}`}>
+          <img
+            src={authorProfilePicture ? authorProfilePicture : blankImage}
+            alt={`${author.firstName}'s display picture`}
+          />
+        </Link>
+        <div className="post-info">
+          <div className='post-name-date'>
+            <div className="post-names-container">
+              <Link to={`/user/${author._id}`}>
+                <p className="post-author">{`${author.firstName} ${author.lastName}`}</p>
+              </Link>
+              {recipient && (
+                <>
+                  <span className="recipient-arrow">{' > '}</span>
+                  <Link to={`/user/${recipient._id}`}>
+                    <p className="post-recipient">{`${recipient.firstName} ${recipient.lastName}`}</p>
+                  </Link>
+                </>
+              )}
+            </div>
+            <div className="date-container">
+              <p className='date'>{formatDate(date)}</p>
+            </div>
           </div>
-            
-            {recipient && (
-              <>
-                <span className="recipient-arrow">{' > '}</span>
-                <Link to={`/user/${recipient._id}`}>
-                  <p className="post-recipient">{`${recipient.firstName} ${recipient.lastName}`}</p>
-                </Link>
-              </>
-            )}
-          </div>
-          {author._id === user?.id || (recipient && recipient._id === user?.id) ? (
-            <button className="delete-post" onClick={handleDeleteClick}>
-              Delete
-            </button>
-          ) : null}
         </div>
+        {author._id === user?.id || (recipient && recipient._id === user?.id) ? (
+          <button className="delete-post" onClick={handleDeleteClick}>
+            Delete
+          </button>
+        ) : null}
+      </div>
         <p className="post-content">{content}</p>
 
         <LikesSection likes={likes}/>
