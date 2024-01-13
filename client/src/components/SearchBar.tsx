@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SearchBarProps } from '../types/types';
 
-const SearchBar: React.FC<SearchBarProps> = ({ initialQuery = '' }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ initialQuery = '', closeMobileNav }) => {
   const [searchTerm, setSearchTerm] = useState(initialQuery);
   const navigate = useNavigate();
 
@@ -12,8 +12,11 @@ const SearchBar: React.FC<SearchBarProps> = ({ initialQuery = '' }) => {
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (closeMobileNav) closeMobileNav(false)
     navigate(`/search?query=${searchTerm}`);
   };
+
+
 
   return (
     <form onSubmit={handleSearchSubmit} className="search-bar">

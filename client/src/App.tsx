@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import './App.css';
 import { useAuthContext } from './hooks/useAuthContext';
+import { AuthContextProvider } from './context/AuthContext';
 
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -17,6 +18,7 @@ import PostPage from './components/PostPage';
 
 function App() {
   const { user } = useAuthContext();
+  const [initialPath, setInitialPath] = useState(window.location.pathname);
 
   return (
     <Router>
@@ -26,11 +28,11 @@ function App() {
           <Routes>
             <Route 
               path="/login" 
-              element={user ? <Navigate to='/' /> : <Login />} 
+              element={user ? <Navigate to={initialPath} /> : <Login />} 
             />
             <Route 
               path="/register" 
-              element={user ? <Navigate to='/' /> : <Register />} 
+              element={user ? <Navigate to={initialPath} /> : <Register />} 
             />
             <Route
               path="/user/:id"
@@ -71,4 +73,8 @@ function App() {
   );
 }
 
-export default App;
+export default () => (
+  <AuthContextProvider>
+    <App />
+  </AuthContextProvider>
+);

@@ -155,6 +155,42 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, markA
           </Link>
         )}
 
+        {notification.type === 'displayPictureCommentLike' && (
+          <Link to={`/user/${notification.sender._id}/display-picture`}>
+            <div className="notification-content">
+              <img
+                src={displayPicture || blankImage}
+                alt="Sender's display picture"
+                className="notification-image"
+              />
+              <div className="notification-text">
+                <strong>
+                  {notification.sender.firstName} {notification.sender.lastName}
+                </strong>
+                <p>has liked your comment.</p>
+              </div>
+            </div>
+          </Link>
+        )}
+
+        {notification.type === 'postFromFriend' && (
+          <Link to={`/post/${notification.postId}`}>
+            <div className="notification-content">
+              <img
+                src={displayPicture || blankImage}
+                alt="Sender's display picture"
+                className="notification-image"
+              />
+              <div className="notification-text">
+                <strong>
+                  {notification.sender.firstName} {notification.sender.lastName}
+                </strong>
+                <p>has posted on your wall.</p>
+              </div>
+            </div>
+          </Link>
+        )}
+
         <button
           className="delete-notification-btn"
           onClick={() => deleteNotification(notification._id)}

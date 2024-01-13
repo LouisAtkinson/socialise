@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import UserCard from './UserCard';
 import { UserCardProps } from '../types/types';
 import { useAuthContext } from '../hooks/useAuthContext';
@@ -10,6 +10,8 @@ function FriendPage() {
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const [friends, setFriends] = useState<UserCardProps[]>([]);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -29,6 +31,7 @@ function FriendPage() {
         if (!response.ok) {
           throw new Error('Error fetching friends');
         }
+        setLoading(false);
         const data = await response.json();
         setFriends(data);
       } catch (error) {
@@ -39,18 +42,32 @@ function FriendPage() {
     fetchFriends();
   }, [id]);
 
+  const handleReturnToProfile = () => {
+    navigate(`/user/${id}`);
+  };
+
   return (
     <div className="friend-page">
       <h2>Friends</h2>
-      {friends.length === 0 ? (
-        <p>No friends added yet.</p>
-      ) : (
-        <div className="friend-list">
-          {friends.map((friend) => (
-            <UserCard key={friend._id} {...friend} />
-          ))}
-        </div>
+      {loading && <h3>Loading...</h3>}
+      {!loading && (
+        friends.length === 0 ? (
+          <p>No friends added yet.</p>
+        ) : (
+          <div className="friend-list">
+            {friends.map((friend) => (
+              <UserCard key={friend._id} {...friend} />
+            ))}
+          </div>
+        )
       )}
+      <button
+        className="return-btn"
+        type="button"
+        onClick={handleReturnToProfile}
+      >
+        Return to profile
+      </button>
     </div>
   );
 }

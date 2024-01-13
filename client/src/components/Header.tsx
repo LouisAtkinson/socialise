@@ -23,7 +23,7 @@ function Header() {
       <div className="nav-container">
         {user ? (
           <>
-            <MobileNav isOpen={isMobileNavOpen} onClose={handleMobileNavToggle} />
+            <MobileNav isOpen={isMobileNavOpen} onClose={() => {setIsMobileNavOpen(false)}}/>
 
             <div className="mobile-notifications">
               <Notifications/>
@@ -36,7 +36,7 @@ function Header() {
             </div>
 
             <nav className="desktop-nav">
-              <SearchBar />
+              <SearchBar closeMobileNav={null}/>
               <Notifications />
               <Link to="/">Home</Link>
               <Link to={`/user/${user?.id}`}>My Profile</Link>

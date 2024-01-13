@@ -8,7 +8,6 @@ import { fetchDisplayPicture } from '../helpers/helpers';
 
 const UserCard: React.FC<UserCardProps> = ({
   _id,
-  displayPicture,
   firstName,
   lastName,
   hometown,
@@ -25,13 +24,13 @@ const UserCard: React.FC<UserCardProps> = ({
     };
 
     getProfilePicture();
-  }, [_id, userDisplayPicture]);
+  }, [_id]);
 
   return (
     <div className='user-card'>
       <Link to={`/user/${_id}`}>
         <div className="user-card-display-picture">
-          <img src={userDisplayPicture ? userDisplayPicture : blankImage} alt="User Display" />
+          <img src={userDisplayPicture ? userDisplayPicture : blankImage} alt="User's display picture" />
         </div>
       </Link>
       <div className="user-card-details">

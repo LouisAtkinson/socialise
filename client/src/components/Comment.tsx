@@ -35,10 +35,12 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
         logout();
         return;
       }
+
+      const commentType = (type === 'post') ? 'posts' : 'display-pictures';
   
       const endpoint = isLiked 
-        ? `/api/posts/${parentId}/comments/${_id}/unlike` 
-        : `/api/posts/${parentId}/comments/${_id}/like`;
+        ? `/api/${commentType}/${parentId}/comments/${_id}/unlike` 
+        : `/api/${commentType}/${parentId}/comments/${_id}/like`;
       const method = isLiked ? 'DELETE' : 'POST';
 
       const response = await fetch(endpoint, {

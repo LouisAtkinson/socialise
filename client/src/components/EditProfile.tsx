@@ -47,9 +47,9 @@ function EditProfile({ currentUser }: EditProfileProps) {
             occupation: userData.occupation || '',
             displayPicture: displayPicture || '',
             privateInfo: {
-              birthday: userData.visibility?.birthday || true,
-              hometown: userData.visibility?.hometown || true,
-              occupation: userData.visibility?.occupation || true,
+              birthday: !userData.visibility?.birthday || true,
+              hometown: !userData.visibility?.hometown || true,
+              occupation: !userData.visibility?.occupation || true,
             },
           });
 
@@ -77,7 +77,6 @@ function EditProfile({ currentUser }: EditProfileProps) {
         },
       }) as FormState);
     } else {
-      // const updatedValue = name === 'dateOfBirth' ? new Date(value) : value;
 
       setFormState((prevFormState) => ({
         ...prevFormState,
@@ -211,7 +210,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
               <input
                 type="checkbox"
                 name="birthday"
-                checked={!formState.privateInfo.birthday}
+                checked={formState.privateInfo.birthday}
                 onChange={handleInputChange}
               />
               <label>Private</label>
@@ -231,7 +230,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
               <input
                 type="checkbox"
                 name="hometown"
-                checked={!formState.privateInfo.hometown}
+                checked={formState.privateInfo.hometown}
                 onChange={handleInputChange}
               />
               <label>Private</label>
@@ -251,7 +250,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
               <input
                 type="checkbox"
                 name="occupation"
-                checked={!formState.privateInfo.occupation}
+                checked={formState.privateInfo.occupation}
                 onChange={handleInputChange}
               />
               <label>Private</label>

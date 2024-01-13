@@ -14,7 +14,6 @@ const LikesPopup: React.FC<LikesPopupProps> = ({ likes, onClose }) => {
           <UserCard
             key={like._id}
             _id={like._id}
-            displayPicture={like.displayPicture}
             firstName={like.firstName}
             lastName={like.lastName}
             hometown={null}

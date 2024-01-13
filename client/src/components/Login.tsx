@@ -59,7 +59,7 @@ function Login() {
   };
 
   return (
-    <div>
+    <div className='login-page'>
       <div className="introduction-container">
         <h2 className="introduction-title">Hello and welcome!</h2>
         <br/>

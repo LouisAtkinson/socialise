@@ -10,6 +10,7 @@ const SearchPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const usersPerPage = 20;
   const totalPages = Math.ceil(users.length / usersPerPage);
+  const [loading, setLoading] = useState<Boolean>(true);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -20,8 +21,10 @@ const SearchPage: React.FC = () => {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        setLoading(true);
         const response = await fetch(`/api/user/search/${searchQuery}`);
         if (response.ok) {
+          setLoading(false);
           const data = await response.json();
           setUsers(data);
         } else {
@@ -45,20 +48,23 @@ const SearchPage: React.FC = () => {
 
   return (
     <div className="search-page">
-      <SearchBar initialQuery={searchQuery} />
-      <div className="user-list">
-        {currentUsers.map((user) => (
-            <UserCard
-                key={user._id} 
-                _id={user._id}
-                displayPicture={user.displayPicture}
-                firstName={user.firstName}
-                lastName={user.lastName}
-                hometown={user.hometown || null}
-                visibility={user.visibility}
-            />        
-        ))}
-      </div>
+      <SearchBar initialQuery={searchQuery} closeMobileNav={null}/>
+      {loading && <h3 className='search-loading'>Loading...</h3>}
+      {!loading && (
+        <div className="user-list">
+          {users?.length === 0 && (<h4 className='no-users'>No users match search criteria</h4>)}
+          {currentUsers.map((user) => (
+              <UserCard
+                  key={user._id} 
+                  _id={user._id}
+                  firstName={user.firstName}
+                  lastName={user.lastName}
+                  hometown={user.hometown || null}
+                  visibility={user.visibility}
+              />        
+          ))}
+        </div>
+      )}
       {(totalPages < 2) ? <></> : 
         <div className="pagination">
           {Array.from({ length: Math.ceil(users.length / usersPerPage) }).map((_, index) => (

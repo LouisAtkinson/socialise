@@ -8,6 +8,11 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
   const { logout } = useLogout();
   const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
+
+  const toggleDropdown = () => {
+    setDropdownOpen(!isDropdownOpen);
+  };
 
   useEffect(() => {
     const checkFriendshipStatus = async () => {
@@ -34,7 +39,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
               ? 'pending' 
             : data.hasPendingRequestFromOtherUser
               ? 'received'
-            : null);
+            : 'notFriends');
           setLoading(false);        
           } else {
           console.error('Error checking friendship status:', response.statusText);
@@ -45,7 +50,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
     };
 
     checkFriendshipStatus();
-  }, [userId, user, logout]);
+  }, [userId]);
 
   const handleAddFriend = async () => {
     try {
@@ -161,20 +166,27 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
 
   return (
     <div>
-      {(user.id !== userId) &&
-        (<div className="friendship-actions">
-        {friendshipStatus === 'friends' && <p>Friends</p>}
-        {friendshipStatus === 'pending' && <p>Friend request pending</p>}
-        {friendshipStatus === 'received' && (
-          <div>
-            <button onClick={handleAcceptFriendRequest}>Accept friend request</button>
-            <button onClick={handleDenyFriendRequest}>Deny friend request</button>
-          </div>
-        )}
-        {friendshipStatus === 'sent' && <p>Friend request sent</p>}
-        {!friendshipStatus && <button onClick={handleAddFriend}>Add friend</button>}
-        {friendshipStatus === 'friends' && <button onClick={handleRemoveFriend}>Remove friend</button>}
-      </div>)}
+      {(user.id !== userId) && !loading && (
+        <div className="friendship-actions">
+          {friendshipStatus === 'friends' && (
+            <button className='friend-button' onClick={toggleDropdown}>Friends ▼</button>
+          )}
+          {friendshipStatus === 'pending' && <p className='pending-friends'>Friend request pending</p>}
+          {friendshipStatus === 'received' && (
+            <div>
+              <button onClick={handleAcceptFriendRequest}>Accept friend request</button>
+              <button onClick={handleDenyFriendRequest}>Deny friend request</button>
+            </div>
+          )}
+          {friendshipStatus === 'sent' && <p className='pending-friends'>Friend request sent</p>}
+          {friendshipStatus === 'notFriends' && <button onClick={handleAddFriend} className='friend-button'>Add friend</button>}
+          {friendshipStatus === 'friends' && isDropdownOpen && (
+            <div className="friend-dropdown">
+              <button onClick={handleRemoveFriend}>Remove friend</button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

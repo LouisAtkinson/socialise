@@ -1,6 +1,11 @@
 export interface PostData {
     _id: string;
     content: string;
+    recipient: {
+        _id: string;
+        firstName: string;
+        lastName: string;
+    } | null;
     author: {
       _id: string;
       displayPicture: string | null;
@@ -15,6 +20,11 @@ export interface PostData {
 export interface PostProps {
     _id: string;
     content: string;
+    recipient: {
+        _id: string;
+        firstName: string;
+        lastName: string;
+    } | null;
     author: {
       _id: string;
       displayPicture: string | null;
@@ -60,6 +70,13 @@ export interface Like {
     displayPicture: string | null;
 }
 
+export interface DisplayPictureOwner {
+    id: string;
+    firstName: string;
+    lastName: string;
+    fullName: string;
+}
+
 export interface UserProfileProps {
     id: string;
     firstName: string;
@@ -86,6 +103,7 @@ export interface UserFriendProps {
 
 export interface SearchBarProps {
     initialQuery?: string;
+    closeMobileNav: Function | null;
 }
 
 export interface FriendButtonProps {
@@ -94,7 +112,6 @@ export interface FriendButtonProps {
 
 export interface UserCardProps {
     _id: string;
-    displayPicture: string | null;
     firstName: string;
     lastName: string;
     hometown: string | null;
@@ -144,7 +161,7 @@ export interface FormState {
 
 export interface PostFormProps {
     onSubmit: (postContent: string) => void;
-}
+}  
 
 export interface NotificationType {
     _id: string;
@@ -154,7 +171,7 @@ export interface NotificationType {
       lastName: string;
       displayPicture: string | null;
     };
-    type: string; // friendRequest, postLike, displayPictureLike, postComment, displayPictureComment, friendRequestAccepted
+    type: string;
     isRead: boolean;
     postId: string;
     commentId: string;

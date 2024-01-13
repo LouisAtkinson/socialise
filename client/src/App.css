@@ -63,6 +63,10 @@ body {
   overflow: hidden;
 }
 
+.search-loading, .no-users {
+  margin: 30px 7px 7px 7px;
+}
+
 .desktop-nav > .search-bar {
   margin-right: 30px;
 }
@@ -89,7 +93,7 @@ body {
   transition: background-color 0.2s ease;
 }
 
-.search-button:hover, .friendship-actions button:hover {
+.search-button:hover {
   background-color: #0071e9
 }
 
@@ -208,6 +212,7 @@ body {
   background-color: #fff;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
+  border-radius: 10px;
 }
 
 .main-content:hover {
@@ -268,6 +273,10 @@ body {
   margin-bottom: 20px;
 }
 
+.user-info h2, .post-section h3, .friend-page h3 {
+  margin-bottom: 10px;
+}
+
 .profile-picture img {
   width: 150px;
   height: 150px;
@@ -280,8 +289,8 @@ body {
   text-align: center;
   margin-bottom: 20px;
   padding: 15px;
-  border: 1px solid #ddd; /* Add a border */
-  border-radius: 8px; /* Add some border radius for a softer look */
+  border: 1px solid #ddd;
+  border-radius: 8px;
 }
 
 .section-title {
@@ -374,6 +383,11 @@ body {
   margin-right: 10px;
 }
 
+.post-info {
+  display: flex;
+  gap: 5px;
+}
+
 .post-info p {
   margin: 0;
 }
@@ -382,9 +396,18 @@ body {
   text-decoration: none;
 }
 
-.post-author, .comment-author, .like-link, .remaining-likes {
+.post-author, .comment-author, .like-link, .remaining-likes, .post-recipient {
   font-weight: 700;
   text-decoration: none;
+}
+
+.post-author {
+  margin-right: 4px;
+}
+
+.recipient-arrow {
+  float: left;
+  color: hsl(0, 0%, 53%);
 }
 
 .comment-section {
@@ -397,6 +420,7 @@ body {
 .comment-name-date {
   display: flex;
   gap: 10px;
+  align-items: center;
 }
 
 .delete-post, .delete-notification-btn {
@@ -430,6 +454,7 @@ body {
 
 .post-content {
   margin-bottom: 10px;
+  font-size: 18px;
 }
 
 .post-content, .comment-content {
@@ -525,7 +550,7 @@ textarea {
 .comment {
   display: flex;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
   border-top: 1px solid #ccc;
   padding-top: 10px;
 }
@@ -564,6 +589,12 @@ textarea {
 .date {
   color: rgb(105, 105, 105);
   font-size: 14px;
+}
+
+.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .login-container {
@@ -676,7 +707,7 @@ textarea {
 
 .notifications-menu {
   position: absolute;
-  top: 100%; 
+  top: 130%; 
   right: 0;
   max-height: 200px;
   width: 250px;
@@ -763,6 +794,7 @@ textarea {
   display: flex;
   align-items: center;
   margin-right: -20px;
+  margin-top: 5px;
 }
 
 .notification-image {
@@ -838,7 +870,7 @@ textarea {
   margin-bottom: 10px;
 }
 
-.form-group {
+.login-form .form-group {
   margin-bottom: 25px;
 }
 
@@ -929,7 +961,7 @@ textarea {
 }
 
 .user-list {
-  margin-top: 10px;
+  margin-top: 15px;
 }
 
 .user-card {
@@ -982,10 +1014,11 @@ textarea {
 .friendship-actions {
   display: flex;
   gap: 5px;
+  align-items: center;
 }
 
-.friendship-actions button {
-  background-color: #007bff;
+.friend-button {
+  background-color: #4CAF50;
   color: #fff;
   border: none;
   padding: 5px 10px;
@@ -995,14 +1028,70 @@ textarea {
   margin: 0 auto;
 }
 
+.friend-button:hover {
+  background-color: #3ca03f;
+}
+
 .friendship-actions p {
   margin: 0;
   font-weight: bold;
 }
 
+.friend-page h2 {
+  margin-bottom: 20px;
+}
+
+.friendship-actions {
+  position: relative;
+}
+
+.friend-dropdown {
+  position: absolute;
+  z-index: 1;
+  top: 110%; 
+  left: 50%; 
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.friend-dropdown button {
+  display: block;
+  border-radius: 10px;
+  width: 100%;
+  padding: 6px 12px;
+  text-decoration: none;
+  color: rgb(70, 70, 70); 
+  text-align: center;
+  background-color: #e2e2e2;
+  cursor: pointer;
+  word-wrap: none;
+  border: none;
+}
+
+.friend-dropdown button:hover {
+  background-color: #c82333;
+  color: white;
+}
+
+.pending-friends {
+  color: #7a7a7a;
+}
+
+.display-picture > .top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
 .display-picture img {
   max-width: 400px; 
   max-height: 400px;
+}
+
+.likes-section {
+  color: rgb(132, 132, 132);
+  font-size: 15px;
 }
 
 .likes-popup {
@@ -1026,6 +1115,14 @@ textarea {
 .likes-popup-content {
   max-height: 300px;
   overflow-y: auto;
+}
+
+a:not(.header a) {
+  color: #007bff;
+}
+
+a:not(.header a):hover {
+  color: #0071e9;
 }
 
 @media screen and (max-width: 768px) {
