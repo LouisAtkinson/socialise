@@ -64,8 +64,8 @@ function DisplayPicture() {
       }
 
       const endpoint = isLiked
-        ? `/api/display-pictures/${userId}/unlike`
-        : `/api/display-pictures/${userId}/like`;
+        ? `https://socialise-seven.vercel.app/display-pictures/${userId}/unlike`
+        : `https://socialise-seven.vercel.app/display-pictures/${userId}/like`;
 
       const method = isLiked ? 'DELETE' : 'POST';
 
