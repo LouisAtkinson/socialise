@@ -39,8 +39,8 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
       const commentType = (type === 'post') ? 'posts' : 'display-pictures';
   
       const endpoint = isLiked 
-        ? `https://socialise-seven.vercel.app/${commentType}/${parentId}/comments/${_id}/unlike` 
-        : `https://socialise-seven.vercel.app/${commentType}/${parentId}/comments/${_id}/like`;
+        ? `https://socialise-seven.vercel.app/api/${commentType}/${parentId}/comments/${_id}/unlike` 
+        : `https://socialise-seven.vercel.app/api/${commentType}/${parentId}/comments/${_id}/like`;
       const method = isLiked ? 'DELETE' : 'POST';
 
       const response = await fetch(endpoint, {
@@ -69,8 +69,8 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
   const handleDeleteClick = async () => {
     try {
       const endpoint = (type === 'post')
-        ? `https://socialise-seven.vercel.app/posts/${parentId}/comments/${_id}`
-        : `https://socialise-seven.vercel.app/display-pictures/${parentId}/comments/${_id}` 
+        ? `https://socialise-seven.vercel.app/api/posts/${parentId}/comments/${_id}`
+        : `https://socialise-seven.vercel.app/api/display-pictures/${parentId}/comments/${_id}` 
 
       const token = user?.token;
 

@@ -50,8 +50,8 @@ function UserProfile() {
       }
 
       const postEndpoint = isCurrentUserProfile()
-        ? 'https://socialise-seven.vercel.app/posts'
-        : `https://socialise-seven.vercel.app/posts/${userProfile.id}`; 
+        ? 'https://socialise-seven.vercel.app/api/posts'
+        : `https://socialise-seven.vercel.app/api/posts/${userProfile.id}`; 
 
       const response = await fetch(postEndpoint, {
         method: 'POST',
