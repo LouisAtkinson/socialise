@@ -448,6 +448,7 @@ body {
 .delete-notification-btn {
   font-size: 12px;
   padding: 4px 4px;
+  margin-left: 2px;
 }
 
 .delete-post:hover, .delete-notification-btn:hover {
