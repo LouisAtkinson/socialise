@@ -1,0 +1,10 @@
+.user-friend a {
+  text-decoration: none;
+}
+
+.user-friend img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+}

@@ -1,0 +1,46 @@
+.pending-friends {
+  color: #7a7a7a;
+}
+
+.friend-button {
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  display: block;
+  margin: 0 auto;
+}
+
+.friend-button:hover {
+  background-color: #3ca03f;
+}
+
+.friend-dropdown {
+  position: absolute;
+  z-index: 1;
+  top: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.friend-dropdown button {
+  display: block;
+  border-radius: 10px;
+  width: 100%;
+  padding: 6px 12px;
+  text-decoration: none;
+  color: rgb(70, 70, 70);
+  text-align: center;
+  background-color: #e2e2e2;
+  cursor: pointer;
+  word-wrap: none;
+  border: none;
+}
+
+.friend-dropdown button:hover {
+  background-color: var(--delete-btn-hover);
+  color: white;
+}

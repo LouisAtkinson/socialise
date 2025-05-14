@@ -4,17 +4,17 @@ import './App.css';
 import { useAuthContext } from './hooks/useAuthContext';
 import { AuthContextProvider } from './context/AuthContext';
 
-import Header from './components/Header';
-import Footer from './components/Footer';
-import Home from './components/Home';
-import UserProfile from './components/UserProfile';
-import DisplayPicture from './components/DisplayPicture';
-import EditProfile from './components/EditProfile';
-import Login from './components/Login';
-import Register from './components/Register';
-import SearchPage from './components/SearchPage';
-import FriendPage from './components/FriendPage';
-import PostPage from './components/PostPage';
+import Header from './components/Header/Header';
+import Footer from './components/Footer/Footer';
+import Home from './components/Home/Home';
+import UserProfile from './components/UserProfile/UserProfile';
+import DisplayPicture from './components/DisplayPicture/DisplayPicture';
+import EditProfile from './components/EditProfile/EditProfile';
+import Login from './components/Login/Login';
+import Register from './components/Register/Register';
+import SearchPage from './components/SearchPage/SearchPage';
+import FriendPage from './components/FriendPage/FriendPage';
+import PostPage from './components/PostPage/PostPage';
 
 function App() {
   const { user } = useAuthContext();

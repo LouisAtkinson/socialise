@@ -1,0 +1,36 @@
+.notification-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.notification-content {
+  display: flex;
+  align-items: center;
+  margin-right: -20px;
+  margin-top: 5px;
+}
+
+.notification-image {
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
+  border-radius: 50%;
+}
+
+.notification-text {
+  font-size: 15px;
+}
+
+.notification-text strong {
+  float: left;
+  margin-right: 4px;
+}
+
+.unread {
+  background-color: #dbe7ff;
+}
+
+.notification {
+  color: black;
+}

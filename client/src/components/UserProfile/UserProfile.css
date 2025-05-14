@@ -1,0 +1,45 @@
+.user-profile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.user-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.friends-section {
+  text-align: center;
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.section-title {
+  margin-bottom: 10px;
+}
+
+.friends-list {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.see-all-link {
+  display: block;
+  margin-top: 10px;
+  color: var(--default-btn);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.see-all-link:hover {
+  color: #0056b3;
+}
+
+.post-section {
+  width: 100%;
+  max-width: 800px;
+}

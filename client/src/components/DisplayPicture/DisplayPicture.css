@@ -1,0 +1,11 @@
+.display-picture > .top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.display-picture img {
+  max-width: 400px;
+  max-height: 400px;
+}
