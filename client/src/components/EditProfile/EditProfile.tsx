@@ -267,6 +267,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
               : 'save-changes-btn inactive'
           }
           type="submit"
+          onClick={handleSubmit}
           disabled={!unsaved || isSaving}
         >
           {isSaving

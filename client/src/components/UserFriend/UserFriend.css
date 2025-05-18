@@ -1,5 +1,9 @@
-.user-friend a {
+.user-friend-link {
   text-decoration: none;
+}
+
+.user-friend-link:hover .friend-name {
+  color: var(--text-hover);
 }
 
 .user-friend img {

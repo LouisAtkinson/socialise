@@ -22,15 +22,15 @@ const UserFriend: React.FC<UserFriendProps> = ({ friend }) => {
   }, [friend._id]);
 
   return (
-    <div key={friend._id} className="user-friend">
-      <Link to={`/user/${friend._id}`}>
+    <Link to={`/user/${friend._id}`} className='user-friend-link'>
+      <div key={friend._id} className="user-friend">
         <img
           src={displayPicture ? displayPicture : blankImage}
           alt={`${friend.firstName}'s profile`}
         />
-        <p>{`${friend.firstName} ${friend.lastName}`}</p>
-      </Link>
-    </div>
+        <p className='friend-name'>{`${friend.firstName} ${friend.lastName}`}</p>
+      </div>
+    </Link>
   );
 };
 

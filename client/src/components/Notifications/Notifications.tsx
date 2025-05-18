@@ -191,7 +191,9 @@ const NotificationPopup: React.FC = () => {
   return (
     <div className="notifications-dropdown">
       <div className="notifications-link" onClick={() => setIsPopupOpen(!isPopupOpen)}>
-        {isMobile ? (
+        {/* {isMobile ? ( */}
+        {/* for now, only show the bell icon no matter the screen width */}
+        {true ? (
           <span>
             <svg className="bell" fill="currentColor" height="26px" width="26px" viewBox="0 0 611.999 611.999">
             <path d="M570.107,500.254c-65.037-29.371-67.511-155.441-67.559-158.622v-84.578c0-81.402-49.742-151.399-120.427-181.203

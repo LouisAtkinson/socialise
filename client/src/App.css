@@ -26,6 +26,12 @@ body {
   background-color: var(--primary-color);
 }
 
+.App {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .btn-transition {
   background-color: #4568DC;
   background-image: var(--default-btn);
@@ -65,7 +71,6 @@ body {
   flex-direction: column;
   align-items: center;
   max-width: 1200px;
-  margin: 20px auto;
   padding: 20px;
 }
 

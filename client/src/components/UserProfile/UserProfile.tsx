@@ -341,6 +341,13 @@ function UserProfile() {
     fetchFriendsList();
   }, [id]);
 
+  const hasUserInfo = () => {
+    return (userProfile.visibility.birthday && userProfile.birthDay && userProfile.birthMonth ||
+        userProfile.visibility.hometown && userProfile.hometown ||
+        userProfile.visibility.occupation && userProfile.occupation
+      )
+  }
+
   if (loading) {
     return <h3>Loading...</h3>;
   }
@@ -360,19 +367,22 @@ function UserProfile() {
 
         <h2>{`${userProfile.firstName} ${userProfile.lastName}`}</h2>
 
-        <FriendButton userId={userProfile.id} />
+        {!isCurrentUserProfile && <FriendButton userId={userProfile.id} />}
 
-        <div className='user-info'>
-          {userProfile.visibility.birthday && userProfile.birthDay && userProfile.birthMonth && (
-            <p>Birthday: {`${userProfile.birthMonth} ${userProfile.birthDay}`}</p>
-          )}
-          {userProfile.visibility.hometown && userProfile.hometown && (
-            <p>Hometown: {userProfile.hometown}</p>
-          )}
-          {userProfile.visibility.occupation && userProfile.occupation && (
-            <p>Occupation: {userProfile.occupation}</p>
-          )}
-        </div>
+        {hasUserInfo() && 
+          <div className='user-info'>
+            {userProfile.visibility.birthday && userProfile.birthDay && userProfile.birthMonth && (
+              <p>Birthday: {`${userProfile.birthMonth} ${userProfile.birthDay}`}</p>
+            )}
+            {userProfile.visibility.hometown && userProfile.hometown && (
+              <p>Hometown: {userProfile.hometown}</p>
+            )}
+            {userProfile.visibility.occupation && userProfile.occupation && (
+              <p>Occupation: {userProfile.occupation}</p>
+            )}
+          </div>
+        }
+        
 
         {isCurrentUserProfile() && (
           <Link to={`/user/${userProfile.id}/edit-profile`} state={{ user }}>
