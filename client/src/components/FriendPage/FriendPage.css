@@ -1,7 +1,16 @@
-.friend-page h2 {
-  margin-bottom: 20px;
+.friend-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-self: center;
+  width: 100%;
+  max-width: 600px;
 }
 
-.friend-page h3 {
-  margin-bottom: 10px;
+.friend-list {
+  width: 100%;
+}
+
+.friend-page h2 {
+  margin-bottom: 20px;
 }

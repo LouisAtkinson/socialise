@@ -4,7 +4,6 @@
 
 .friend-button {
   background-color: #4caf50;
-  color: #fff;
   border: none;
   padding: 5px 10px;
   cursor: pointer;
@@ -32,9 +31,8 @@
   width: 100%;
   padding: 6px 12px;
   text-decoration: none;
-  color: rgb(70, 70, 70);
   text-align: center;
-  background-color: #e2e2e2;
+  background: var(--secondary-color);
   cursor: pointer;
   word-wrap: none;
   border: none;
@@ -42,5 +40,4 @@
 
 .friend-dropdown button:hover {
   background-color: var(--delete-btn-hover);
-  color: white;
 }

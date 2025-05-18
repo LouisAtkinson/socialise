@@ -22,8 +22,9 @@ function PostForm({ onSubmit }: PostFormProps) {
         placeholder="Write a post..."
         value={newPost}
         onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => handlePostChange(e)}
+        className='post-form-input'
       />
-      <button onClick={handlePostSubmit}>Post</button>
+      <button onClick={handlePostSubmit} className='post-button btn-transition'>Post</button>
     </div>
   );
 }

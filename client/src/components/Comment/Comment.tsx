@@ -117,13 +117,13 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
         <LikesSection likes={likes} />
 
         <div className="post-actions">
-          <button className="like-button" onClick={handleLikeClick}>
+          <button className="like-button btn-transition" onClick={handleLikeClick}>
             {isLiked ? 'Unlike' : 'Like'}
           </button>
         </div>      
       </div>
       {(authorId === user.id) &&
-        <button className="delete-comment" onClick={handleDeleteClick}>
+        <button className="delete-comment btn-transition" onClick={handleDeleteClick}>
           Delete
         </button>
       }

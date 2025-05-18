@@ -26,15 +26,9 @@
 
 .delete-comment {
   background-color: var(--delete-btn);
-  color: #fff;
   border: none;
   border-radius: 4px;
   padding: 4px 8px;
   margin-left: auto;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.delete-comment:hover {
-  background-color: var(--delete-btn-hover);
 }

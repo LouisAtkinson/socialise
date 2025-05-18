@@ -2,7 +2,6 @@
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
-  background-color: #fff;
 }
 
 .edit-profile-container h2 {
@@ -10,7 +9,7 @@
   margin-bottom: 20px;
 }
 
-.edit-profile-container label {
+.input-title {
   display: block;
   margin-bottom: 5px;
   font-weight: bold;
@@ -30,8 +29,6 @@
 }
 
 .file-upload-btn {
-  background-color: var(--default-btn);
-  color: white;
   border: none;
   padding: 10px 15px;
   text-align: center;
@@ -43,10 +40,17 @@
   border-radius: 12px;
 }
 
-.file-upload-btn:hover {
-  background-color: var(--default-btn-hover);
-}
-
 .file-input {
   display: none;
+}
+
+.bottom-btns {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.private-label {
+  font-weight: 300;
+  margin: 0px;
 }

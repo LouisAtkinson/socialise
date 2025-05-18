@@ -2,19 +2,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 }
 
-.user-info {
+.profile-top {
   text-align: center;
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .friends-section {
   text-align: center;
   margin-bottom: 20px;
   padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 10px;
+  border: 2px solid var(--secondary-color)
 }
 
 .section-title {

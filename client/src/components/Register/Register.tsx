@@ -119,7 +119,7 @@ function Register() {
         </div>
         <button 
           type="submit" 
-          className="register-button"
+          className="register-button btn-transition"
           disabled={loading}
         >
           Register

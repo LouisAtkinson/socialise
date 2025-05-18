@@ -347,7 +347,7 @@ function UserProfile() {
 
   return (
     <div className="user-profile">
-      <div className="user-info">
+      <div className="profile-top">
         <div className="profile-picture">
           {userProfile.displayPicture ? (
             <Link to={`/user/${userProfile.id}/display-picture`} state={{ user }}>
@@ -362,19 +362,21 @@ function UserProfile() {
 
         <FriendButton userId={userProfile.id} />
 
-        {userProfile.visibility.birthday && userProfile.birthDay && userProfile.birthMonth && (
-          <p>Birthday: {`${userProfile.birthMonth} ${userProfile.birthDay}`}</p>
-        )}
-        {userProfile.visibility.hometown && userProfile.hometown && (
-          <p>Hometown: {userProfile.hometown}</p>
-        )}
-        {userProfile.visibility.occupation && userProfile.occupation && (
-          <p>Occupation: {userProfile.occupation}</p>
-        )}
+        <div className='user-info'>
+          {userProfile.visibility.birthday && userProfile.birthDay && userProfile.birthMonth && (
+            <p>Birthday: {`${userProfile.birthMonth} ${userProfile.birthDay}`}</p>
+          )}
+          {userProfile.visibility.hometown && userProfile.hometown && (
+            <p>Hometown: {userProfile.hometown}</p>
+          )}
+          {userProfile.visibility.occupation && userProfile.occupation && (
+            <p>Occupation: {userProfile.occupation}</p>
+          )}
+        </div>
 
         {isCurrentUserProfile() && (
           <Link to={`/user/${userProfile.id}/edit-profile`} state={{ user }}>
-            <button className="edit-profile-button">Edit Profile</button>
+            <button className="edit-profile-button btn-transition">Edit Profile</button>
           </Link>
         )}
       </div>

@@ -95,7 +95,7 @@ function Home() {
 
   return (
     <div className="home">
-      <h2>Home</h2>
+      <h2>Welcome back!</h2>
       <PostForm onSubmit={handlePostSubmit}/>
       <div className="post-list">
         {loading && <h3>Loading...</h3>}

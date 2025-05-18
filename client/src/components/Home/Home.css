@@ -1,3 +1,7 @@
+.home {
+  max-width: 600px;
+}
+
 .home h2 {
   margin-bottom: 20px;
 }

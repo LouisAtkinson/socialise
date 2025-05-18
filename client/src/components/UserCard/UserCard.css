@@ -2,8 +2,14 @@
   display: flex;
   align-items: center;
   padding: 10px;
-  border: 1px solid #ddd;
   margin-bottom: 10px;
+  justify-content: space-between;
+  gap: 50px;
+}
+
+.user-card-left {
+  display: flex;
+  align-items: center;
 }
 
 .user-card-display-picture {
@@ -26,7 +32,6 @@
 .you-text {
   margin-left: 5px;
   font-size: 80%;
-  color: gray;
 }
 
 .user-card-display-picture img {

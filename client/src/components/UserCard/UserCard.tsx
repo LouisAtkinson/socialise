@@ -29,26 +29,31 @@ const UserCard: React.FC<UserCardProps> = ({
 
   return (
     <div className='user-card'>
-      <Link to={`/user/${_id}`}>
-        <div className="user-card-display-picture">
-          <img src={userDisplayPicture ? userDisplayPicture : blankImage} alt="User's display picture" />
+      <div className='user-card-left'>
+        <Link to={`/user/${_id}`}>
+          <div className="user-card-display-picture">
+            <img src={userDisplayPicture ? userDisplayPicture : blankImage} alt="User's display picture" />
+          </div>
+        </Link>
+        <div className="user-card-details">
+          <div>
+            <h3 className='user-card-name'>
+              <Link to={`/user/${_id}`} className='user-link'>
+                {`${firstName} ${lastName}`}
+              </Link>
+              {isCurrentUser && <span className='you-text'>(you)</span>}
+            </h3>
+          </div>
+          
+          {visibility?.hometown && hometown && <p>Hometown: {hometown}</p>}
         </div>
-      </Link>
-      <div className="user-card-details">
-      <div>
-        <h3 className='user-card-name'>
-          <Link to={`/user/${_id}`} className='user-link'>
-            {`${firstName} ${lastName}`}
-          </Link>
-          {isCurrentUser && <span className='you-text'>(you)</span>}
-        </h3>
       </div>
-        
-        {visibility?.hometown && hometown && <p>Hometown: {hometown}</p>}
+      <div className='user-name-right'>
+        <div className="user-card-friendship-actions">
+              <FriendButton userId={_id} />
+            </div>
       </div>
-      <div className="user-card-friendship-actions">
-        <FriendButton userId={_id} />
-      </div>
+      
     </div>
   );
 };

@@ -65,7 +65,7 @@ function Login() {
         <h2 className="introduction-title">Hello and welcome!</h2>
         <br/>
         <p>
-          This Facebook-inspired social media site was built using Typescript and React on the front-end, and Express with MongoDB on the back-end.
+          This social media site was built using Typescript and React on the front-end, and Express with MongoDB on the back-end.
         </p>
         <br/>
         <p>
@@ -104,7 +104,7 @@ function Login() {
               required
             />
           </div>
-          <button type="submit" className="login-button">
+          <button type="submit" className="login-button btn-transition">
             Login
           </button>
           {error && <div className='error'>{error}</div>}

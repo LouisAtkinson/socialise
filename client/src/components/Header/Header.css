@@ -1,6 +1,5 @@
 .header {
-  background-color: var(--default-btn);
-  color: #fff;
+  background-color: var(--primary-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -8,10 +7,13 @@
   transition: background-color 0.3s ease;
 }
 
-.header h1 {
+.title {
   font-size: 36px;
   margin: 0;
   padding: 0;
+  background: var(--gradient-text);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .header nav {
@@ -19,46 +21,64 @@
   align-items: center;
 }
 
-.header a {
-  margin-right: 20px;
-}
-
 .header nav a:last-child {
   margin-right: 0;
+}
+
+.header a:hover {
+  color: var(--text-hover)
 }
 
 .nav-container {
   display: flex;
   align-items: center;
+  gap: 20px;
 }
 
 .mobile-notifications {
-  display: none;
+  display: block;
 }
 
 .bar {
   width: 25px;
   height: 3px;
-  background-color: white;
   margin: 5px 0;
+  background-color: white;
+  transition: background-color 0.3s ease;
 }
 
 .burger-menu {
-  display: none;
+  display: block;
   flex-direction: column;
   cursor: pointer;
-  margin: -5px 0px 0px 10px;
+}
+
+.burger-menu:hover .bar {
+  background-color: var(--text-hover);
 }
 
 .desktop-nav {
-  display: flex;
+  display: none;
 }
 
 .desktop-nav > .search-bar {
   margin-right: 30px;
 }
 
-@media screen and (max-width: 768px) {
+.header nav.desktop-nav {
+  display: none;
+}
+
+.burger-menu {
+  display: block;
+  cursor: pointer;
+}
+
+.mobile-notifications {
+  display: block;
+}
+
+/* @media screen and (max-width: 768px) {
   .header nav.desktop-nav {
     display: none;
   }
@@ -66,10 +86,9 @@
   .burger-menu {
     display: block;
     cursor: pointer;
-    padding: 10px;
   }
 
   .mobile-notifications {
     display: block;
   }
-}
+} */

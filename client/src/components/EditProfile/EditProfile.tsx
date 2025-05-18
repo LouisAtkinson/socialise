@@ -186,7 +186,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
               alt="Display picture"
               className="profile-picture"
             />
-            <label htmlFor="file-input" className="file-upload-btn">
+            <label htmlFor="file-input" className="file-upload-btn btn-transition">
               Upload Picture
             </label>
             <input
@@ -202,7 +202,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
           </div>
   
           <div className="form-group">
-            <label>Date of Birth:</label>
+            <label className='input-title'>Date of Birth:</label>
             <BirthdayForm
               formState={formState}
               handleInputChange={handleInputChange}
@@ -214,12 +214,12 @@ function EditProfile({ currentUser }: EditProfileProps) {
                 checked={formState.privateInfo.birthday}
                 onChange={handleInputChange}
               />
-              <label>Private</label>
+              <label className='private-label'>Private</label>
             </div>
           </div>
   
           <div className="form-group">
-            <label>Hometown:</label>
+            <label className='input-title'>Hometown:</label>
             <input
               type="text"
               name="hometown"
@@ -234,12 +234,12 @@ function EditProfile({ currentUser }: EditProfileProps) {
                 checked={formState.privateInfo.hometown}
                 onChange={handleInputChange}
               />
-              <label>Private</label>
+              <label className='private-label'>Private</label>
             </div>
           </div>
   
           <div className="form-group">
-            <label>Occupation:</label>
+            <label className='input-title'>Occupation:</label>
             <input
               type="text"
               name="occupation"
@@ -254,35 +254,36 @@ function EditProfile({ currentUser }: EditProfileProps) {
                 checked={formState.privateInfo.occupation}
                 onChange={handleInputChange}
               />
-              <label>Private</label>
+              <label className='private-label'>Private</label>
             </div>
           </div>
-  
-          <button
-            className={
-              !isSaving && !changesSaved && unsaved
-                ? 'save-changes-btn'
-                : 'save-changes-btn inactive'
-            }
-            type="submit"
-            disabled={!unsaved || isSaving}
-          >
-            {isSaving
-              ? 'Saving...'
-              : changesSaved && !unsaved
-              ? 'Changes saved'
-              : 'Save changes'}
-          </button>
-  
-          <button
-            className="return-btn"
-            type="button"
-            onClick={handleReturnToProfile}
-          >
-            Return to profile
-          </button>
         </form>
       )}
+      <div className='bottom-btns'>
+        <button
+          className={
+            !isSaving && !changesSaved && unsaved
+              ? 'save-changes-btn btn-transition'
+              : 'save-changes-btn inactive'
+          }
+          type="submit"
+          disabled={!unsaved || isSaving}
+        >
+          {isSaving
+            ? 'Saving...'
+            : changesSaved && !unsaved
+            ? 'Changes saved'
+            : 'Save changes'}
+        </button>
+
+        <button
+          className="return-btn btn-transition"
+          type="button"
+          onClick={handleReturnToProfile}
+        >
+          Return to profile
+        </button>
+      </div>
     </div>
   );  
 }

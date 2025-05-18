@@ -169,7 +169,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
           </div>
         </div>
         {author._id === user?.id || (recipient && recipient._id === user?.id) ? (
-          <button className="delete-post" onClick={handleDeleteClick}>
+          <button className="delete-post btn-transition" onClick={handleDeleteClick}>
             Delete
           </button>
         ) : null}
@@ -179,12 +179,12 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
         <LikesSection likes={likes}/>
   
         <div className="post-actions">
-          <button className="like-button" onClick={handleLikeClick}>
+          <button className="like-button btn-transition" onClick={handleLikeClick}>
             {isLiked ? 'Unlike' : 'Like'}
           </button>
   
           <button
-            className="comment-button"
+            className="comment-button btn-transition"
             onClick={handleCommentButtonClick}
           >
             Comment
@@ -198,8 +198,9 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
             placeholder="Add a comment..."
             value={newComment}
             onChange={(e) => setNewComment(e.target.value)}
+            className="comment-input"
           />
-          <button className='submit-comment-btn' onClick={handleCommentSubmit}>Submit</button>
+          <button className='submit-comment-btn btn-transition' onClick={handleCommentSubmit}>Submit</button>
         </div>
       )}
 
@@ -244,7 +245,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
 
         {remainingComments?.length > 0 && (
           <button
-            className="show-more-comments-button"
+            className="show-more-comments-button btn-transition"
             onClick={() => setShowComments(!showComments)}
           >
             {showComments

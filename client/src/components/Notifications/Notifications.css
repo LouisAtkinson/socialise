@@ -1,3 +1,11 @@
+.notifications-link:hover .bell path {
+  color: var(--text-hover);
+}
+
+.bell path {
+  transition: color 0.3s ease;
+}
+
 .notifications-dropdown {
   position: relative;
   display: inline-block;
@@ -7,13 +15,8 @@
   cursor: pointer;
 }
 
-.notification-icon {
-  color: white;
-}
-
 .notification-count {
   background-color: #ff0000;
-  color: #fff;
   border-radius: 50%;
   padding: 2px 6px;
   margin-left: 10px;
@@ -30,17 +33,16 @@
   max-height: 200px;
   width: 250px;
   overflow-y: auto;
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: var(--primary-color);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   z-index: 1;
+  border: 1px solid var(--secondary-color);
 }
 
 .notifications-menu h3 {
   padding: 10px;
   margin: 0;
-  background-color: var(--default-btn);
-  color: #fff;
+  background: var(--default-btn);
   font-size: 16px;
 }
 
@@ -54,21 +56,15 @@
   justify-content: space-evenly;
   margin-top: 7px;
   gap: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 7px;
 }
 
 .mark-all-read,
 .clear-all {
   background: none;
   border: none;
-  color: var(--default-btn);
   cursor: pointer;
   outline: none;
-}
-
-.mark-all-read:hover,
-.clear-all:hover {
-  text-decoration: underline;
 }
 
 .notifications-menu ul {
@@ -84,11 +80,6 @@
 
 .notifications-menu li:last-child {
   border-bottom: none;
-}
-
-.notification-timestamp,
-.notifications-menu p {
-  color: #333;
 }
 
 .notifications-menu strong {

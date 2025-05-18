@@ -63,7 +63,7 @@ function FriendPage() {
         )
       )}
       <button
-        className="return-btn"
+        className="return-btn btn-transition"
         type="button"
         onClick={handleReturnToProfile}
       >

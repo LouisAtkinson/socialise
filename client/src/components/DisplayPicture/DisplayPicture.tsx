@@ -157,12 +157,12 @@ function DisplayPicture() {
           <LikesSection likes={likes} />
 
           <div className="post-actions">
-            <button className="like-button" onClick={handleLikeClick}>
+            <button className="like-button btn-transition" onClick={handleLikeClick}>
               {isLiked ? 'Unlike' : 'Like'}
             </button>
 
             <button
-              className="comment-button"
+              className="comment-button btn-transition"
               onClick={() => setCommentInputVisible(!commentInputVisible)}
             >
               Comment
@@ -177,7 +177,7 @@ function DisplayPicture() {
                 onChange={(e) => setComment(e.target.value)}
               />
               <button
-                className="submit-comment-btn"
+                className="submit-comment-btn btn-transition"
                 onClick={handleCommentSubmit}
               >
                 Submit
@@ -210,7 +210,7 @@ function DisplayPicture() {
         <div>
           <br></br>
           <button
-            className="return-btn"
+            className="return-btn btn-transition"
             type="button"
             onClick={handleReturnToProfile}
           >

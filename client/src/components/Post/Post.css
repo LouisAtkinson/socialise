@@ -1,9 +1,8 @@
 .post-container {
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  border: 2px solid var(--secondary-color);
+  border-radius: 10px;
   padding: 20px;
   margin-bottom: 20px;
-  background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -60,9 +59,16 @@
 
 .recipient-arrow {
   float: left;
-  color: hsl(0, 0%, 53%);
 }
 
 .show-more-comments-button {
   margin: 0px 0px 10px 10px;
+}
+
+.comment-input {
+  background: var(--secondary-color);
+}
+
+.comment-input::placeholder {
+  color: #fff;
 }

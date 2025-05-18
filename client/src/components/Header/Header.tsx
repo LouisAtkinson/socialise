@@ -19,7 +19,7 @@ function Header() {
   return (
     <header className="header">
       <Link to="/">
-        <h1>Socialise</h1>
+        <h1 className='title'>Socialise</h1>
       </Link>
       <div className="nav-container">
         {user ? (
