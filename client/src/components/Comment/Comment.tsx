@@ -6,6 +6,8 @@ import { CommentProps } from '../../types/types';
 import { formatDate, fetchDisplayPicture } from '../../helpers/helpers'; 
 import { Link } from 'react-router-dom';
 import LikesSection from '../LikeSection/LikeSection';
+import DeleteMenu from '../DeleteMenu/DeleteMenu';
+import LikeButton from '../LikeButton/LikeButton';
 import './Comment.css';
 
 function Comment({ _id, authorId, displayPicture, fullName, datetime, content, likes, parentId, update, type }: CommentProps) {
@@ -108,7 +110,7 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
       <div className="comment-info">
         <div className='comment-name-date'>
           <Link to={`/user/${authorId}`}>
-            <p className='comment-author'>{fullName}</p>
+            <p className='comment-author text-transition'>{fullName}</p>
           </Link>
           <p className='date'>{formatDate(datetime)}</p>
         </div>
@@ -117,16 +119,13 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
         <LikesSection likes={likes} />
 
         <div className="post-actions">
-          <button className="like-button btn-transition" onClick={handleLikeClick}>
-            {isLiked ? 'Unlike' : 'Like'}
-          </button>
+          <LikeButton isLiked={isLiked} likeFunction={handleLikeClick} />
         </div>      
       </div>
-      {(authorId === user.id) &&
-        <button className="delete-comment btn-transition" onClick={handleDeleteClick}>
-          Delete
-        </button>
-      }
+      {authorId === user?.id ? (
+          <DeleteMenu deleteFunction={handleDeleteClick} />
+        ) : null}
+
     </div>
   );
 }

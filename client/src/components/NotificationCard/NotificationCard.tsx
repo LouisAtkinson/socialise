@@ -193,7 +193,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, markA
         )}
 
         <button
-          className="delete-notification-btn btn-transition"
+          className="delete-notification-btn delete-hover"
           onClick={() => deleteNotification(notification._id)}
         >
           Delete

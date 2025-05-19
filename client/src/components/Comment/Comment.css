@@ -2,7 +2,7 @@
   display: flex;
   align-items: center;
   margin-bottom: 10px;
-  border-top: 1px solid #ccc;
+  border-top: 1px solid var(--secondary-color);
   padding-top: 10px;
 }
 
@@ -31,4 +31,5 @@
   padding: 4px 8px;
   margin-left: auto;
   cursor: pointer;
+  align-self: start;
 }

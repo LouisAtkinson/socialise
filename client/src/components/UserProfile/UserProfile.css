@@ -36,7 +36,7 @@
   margin-top: 10px;
   color: var(--default-btn);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .see-all-link:hover {

@@ -45,7 +45,7 @@ body {
 }
 
 .text-transition {
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .text-transition:hover {
@@ -54,7 +54,7 @@ body {
 
 .header a, .notifications-link {
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .header a:hover, .notifications-link:hover {
@@ -96,15 +96,6 @@ body {
   padding: 5px;
 }
 
-.delete-post, .delete-notification-btn {
-  background-color: var(--delete-btn);
-  border: none;
-  border-radius: 4px;
-  padding: 4px 8px;
-  margin-left: auto;
-  cursor: pointer;
-}
-
 .break-word {
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -117,9 +108,9 @@ body {
   display: flex;
   align-items: center;
   margin-top: 10px;
+  gap: 15px;
 }
 
-.like-button,
 .comment-button {
   border: none;
   border-radius: 4px;
@@ -226,7 +217,7 @@ form-input::placeholder {
 .register-login-text a {
   color: var(--primary-color);
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: color 0.2s ease;
 }
 
 .edit-profile-button, .save-changes-btn, .return-btn {
@@ -297,4 +288,13 @@ a:not(.header a) {
 
 a:not(.header a):hover {
   color: var(--text-hover);
+}
+
+.delete-hover {
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.delete-hover:hover {
+  background-color: var(--delete-btn-hover);
 }

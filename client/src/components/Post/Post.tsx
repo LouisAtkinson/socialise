@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import Comment from '../Comment/Comment'; 
 import LikesSection from '../LikeSection/LikeSection';
 import blankImage from '../../images/blank.png';
+import DeleteMenu from '../DeleteMenu/DeleteMenu';
+import LikeButton from '../LikeButton/LikeButton';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { CommentData, Like, PostProps } from '../../types/types';
@@ -152,13 +154,13 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
           <div className='post-name-date'>
             <div className="post-names-container">
               <Link to={`/user/${author._id}`}>
-                <p className="post-author">{`${author.firstName} ${author.lastName}`}</p>
+                <p className="post-author text-transition">{`${author.firstName} ${author.lastName}`}</p>
               </Link>
               {recipient && (
                 <>
                   <span className="recipient-arrow">{' > '}</span>
                   <Link to={`/user/${recipient._id}`}>
-                    <p className="post-recipient">{`${recipient.firstName} ${recipient.lastName}`}</p>
+                    <p className="post-recipient text-transition">{`${recipient.firstName} ${recipient.lastName}`}</p>
                   </Link>
                 </>
               )}
@@ -169,9 +171,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
           </div>
         </div>
         {author._id === user?.id || (recipient && recipient._id === user?.id) ? (
-          <button className="delete-post btn-transition" onClick={handleDeleteClick}>
-            Delete
-          </button>
+          <DeleteMenu deleteFunction={handleDeleteClick} />
         ) : null}
       </div>
         <p className="post-content break-word">{content}</p>
@@ -179,9 +179,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
         <LikesSection likes={likes}/>
   
         <div className="post-actions">
-          <button className="like-button btn-transition" onClick={handleLikeClick}>
-            {isLiked ? 'Unlike' : 'Like'}
-          </button>
+          <LikeButton isLiked={isLiked} likeFunction={handleLikeClick} />
   
           <button
             className="comment-button btn-transition"
@@ -200,7 +198,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
             onChange={(e) => setNewComment(e.target.value)}
             className="comment-input"
           />
-          <button className='submit-comment-btn btn-transition' onClick={handleCommentSubmit}>Submit</button>
+          <button className='submit-comment-btn btn-transition' onClick={handleCommentSubmit}>Post</button>
         </div>
       )}
 
@@ -249,8 +247,10 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
             onClick={() => setShowComments(!showComments)}
           >
             {showComments
-              ? 'Hide Comments'
-              : `Show ${remainingComments.length} More Comments`}
+              ? 'Hide comments'
+              : `Show ${remainingComments.length} more comment${
+                  remainingComments.length === 1 ? '' : 's'
+                }`}
           </button>
         )}
       </div>

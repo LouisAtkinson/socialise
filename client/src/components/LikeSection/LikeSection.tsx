@@ -8,7 +8,7 @@ const LikesSection: React.FC<LikesSectionProps> = ({ likes }) => {
   const [showLikesPopup, setShowLikesPopup] = useState(false);
 
   const renderLikeLink = (like: Like) => (
-    <Link key={like._id} to={`/user/${like._id}`} className="like-link">
+    <Link key={like._id} to={`/user/${like._id}`} className="like-link text-transition">
       {`${like.firstName} ${like.lastName}`}
     </Link>
   );

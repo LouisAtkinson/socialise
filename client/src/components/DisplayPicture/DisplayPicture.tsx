@@ -7,6 +7,7 @@ import { CommentData, Like, DisplayPictureOwner } from '../../types/types';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { fetchDisplayPicture } from '../../helpers/helpers';
+import LikeButton from '../LikeButton/LikeButton';
 import './DisplayPicture.css';
 
 function DisplayPicture() {
@@ -140,7 +141,7 @@ function DisplayPicture() {
   };
 
   return (
-    <div>
+    <div className='display-picture'>
       {isLoading ? (
         <h3>Loading...</h3>
       ) : (
@@ -157,9 +158,7 @@ function DisplayPicture() {
           <LikesSection likes={likes} />
 
           <div className="post-actions">
-            <button className="like-button btn-transition" onClick={handleLikeClick}>
-              {isLiked ? 'Unlike' : 'Like'}
-            </button>
+            <LikeButton isLiked={isLiked} likeFunction={handleLikeClick} />
 
             <button
               className="comment-button btn-transition"
@@ -175,12 +174,13 @@ function DisplayPicture() {
                 placeholder="Add a comment..."
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
+                className='comment-input'
               />
               <button
                 className="submit-comment-btn btn-transition"
                 onClick={handleCommentSubmit}
               >
-                Submit
+                Post
               </button>
             </div>
           )}
@@ -207,8 +207,6 @@ function DisplayPicture() {
         </div>
       )}
       {owner && (
-        <div>
-          <br></br>
           <button
             className="return-btn btn-transition"
             type="button"
@@ -216,7 +214,6 @@ function DisplayPicture() {
           >
             Return to profile
           </button>
-        </div>
       )}   
     </div>
   );

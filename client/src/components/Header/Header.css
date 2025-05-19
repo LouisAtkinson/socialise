@@ -4,7 +4,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 10px 20px;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
   width: 100%;
 }
 
@@ -45,7 +45,7 @@
   height: 3px;
   margin: 5px 0;
   background-color: white;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
 }
 
 .burger-menu {
