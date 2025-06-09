@@ -59,12 +59,15 @@ function Login() {
         <h2 className="introduction-title">Hello and welcome!</h2>
         <br/>
         <p>
-          This social media site was built using Typescript and React on the front-end, and Express with MongoDB on the back-end.
+          This social media site is built with React and TypeScript on the front-end, and .NET on the back-end, using PostgreSQL as the database.
         </p>
         <br/>
         <p>
-          A ready-made user is provided, however feel free to create your own account if you wish.
-          You can also check out the source code on <a href="https://github.com/LouisAtkinson/socialise" target="_blank" rel="noopener noreferrer">GitHub</a> to see how it was built.
+          It is deployed on AWS using Elastic Beanstalk, S3, CloudFront, and Route 53 for reliable and scalable hosting.
+        </p>
+        <br/>
+        <p>
+          A ready-made user is provided, but feel free to create your own account if you wish. You can view the source code for the <a href="https://github.com/LouisAtkinson/socialise" target="_blank" rel="noopener noreferrer">front-end</a> and the <a href="https://github.com/LouisAtkinson/socialise.NET" target="_blank" rel="noopener noreferrer">back-end</a> on GitHub.
         </p>
       </div>
       <div className="login-container">
