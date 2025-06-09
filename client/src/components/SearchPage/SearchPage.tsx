@@ -3,7 +3,9 @@ import { useLocation } from 'react-router-dom';
 import SearchBar from '../SearchBar/SearchBar';
 import UserCard from '../UserCard/UserCard';
 import './SearchPage.css';
+import { UserCardProps } from '../../types/types';
 import { useAuthContext } from '../../hooks/useAuthContext';
+import { fetchUsersByQuery } from '../../services/userService';
 import { apiBaseUrl } from '../../config';
 
 const SearchPage: React.FC = () => {
@@ -24,26 +26,18 @@ const SearchPage: React.FC = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      if (!user?.token) return;
+    if (!user?.token) return;
 
-      try {
-        setLoading(true);
-        const response = await fetch(`${apiBaseUrl}/user/search/${searchQuery}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
-          },
-        });
-        if (response.ok) {
-          setLoading(false);
-          const data = await response.json();
-          setUsers(data);
-        } else {
-          console.error('Error searching users:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error searching users:', error);
-      }
-    };
+    try {
+      setLoading(true);
+      const data: UserCardProps[] = await fetchUsersByQuery(searchQuery, user.token);
+      setUsers(data);
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
     if (searchQuery !== '') {
       fetchUsers();

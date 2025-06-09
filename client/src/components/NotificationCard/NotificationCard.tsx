@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { NotificationType, NotificationCardProps } from '../../types/types';
-import { fetchDisplayPicture } from '../../helpers/helpers';
+import { fetchDisplayPicture } from '../../services/displayPictureService';
 import blankImage from '../../images/blank.png';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import './NotificationCard.css';

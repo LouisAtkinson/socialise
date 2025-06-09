@@ -4,7 +4,7 @@ import blankImage from '../../images/blank.png';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import FriendButton from '../FriendButton/FriendButton';
 import { UserCardProps } from '../../types/types';
-import { fetchDisplayPicture } from '../../helpers/helpers';
+import { fetchDisplayPicture } from '../../services/displayPictureService';
 import { useLogout } from '../../hooks/useLogout';
 import { apiBaseUrl } from '../../config';
 import './UserCard.css';
@@ -31,32 +31,6 @@ const UserCard: React.FC<UserCardProps> = ({
 
     getProfilePicture();
   }, [id]);
-
-  const checkFriendshipStatus = async () => {
-      try {
-        const token = user?.token;
-  
-        if (!token) {
-          logout();
-          return;
-        }
-  
-        const response = await fetch(`${apiBaseUrl}/friends/status/${user?.id}/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        if (response.ok) {
-          const data = await response.json();
-          setFriendshipStatus(data.status);
-        } else {
-          console.error('Error checking friendship status:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error checking friendship status:', error);
-      }
-    };
 
   return (
     <div className='user-card'>

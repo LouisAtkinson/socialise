@@ -5,7 +5,8 @@ import { EditProfileProps, PrivateInfo, FormState } from '../../types/types';
 import BirthdayForm from '../BirthdayForm/BirthdayForm';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
-import { fetchDisplayPicture } from '../../helpers/helpers';
+import { fetchDisplayPicture, uploadDisplayPicture } from '../../services/displayPictureService';
+import { fetchUserData, updateUserInfo } from '../../services/userService';
 import './EditProfile.css';
 import { apiBaseUrl } from '../../config';
 
@@ -34,42 +35,34 @@ function EditProfile({ currentUser }: EditProfileProps) {
   const { logout } = useLogout();
 
   React.useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchUserDataHandler = async () => {
       if (!currentUser?.id || !user?.token) return;
+
       try {
-        const response = await fetch(`${apiBaseUrl}/user/${currentUser.id}`, {
-          headers: {
-            Authorization: `Bearer ${user.token}`,
+        const token = user.token;
+        const userData = await fetchUserData(currentUser.id, token);
+        const displayPicture = await fetchDisplayPicture(currentUser.id, 'full', token);
+
+        setFormState({
+          birthDay: userData.birthDay || '',
+          birthMonth: userData.birthMonth || '',
+          hometown: userData.hometown || '',
+          occupation: userData.occupation || '',
+          displayPicture: displayPicture || null,
+          privateInfo: {
+            birthday: !userData.visibility?.birthday,
+            hometown: !userData.visibility?.hometown,
+            occupation: !userData.visibility?.occupation,
           },
         });
-        if (response.ok) {
-          const userData = await response.json();
-          const token = user?.token;
-          const displayPicture = await fetchDisplayPicture(currentUser.id, 'full', token);
 
-          setFormState({
-            birthDay: userData.birthDay || '',
-            birthMonth: userData.birthMonth || '',
-            hometown: userData.hometown || '',
-            occupation: userData.occupation || '',
-            displayPicture: displayPicture || null,
-            privateInfo: {
-              birthday: !userData.visibility?.birthday,
-              hometown: !userData.visibility?.hometown,
-              occupation: !userData.visibility?.occupation,
-            },
-          });
-
-          setLoading(false);
-        } else {
-          console.error('Failed to fetch user information');
-        }
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching user information:', error);
       }
     };
 
-    fetchUserData();
+    fetchUserDataHandler();
   }, [currentUser.id]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -113,9 +106,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
-    const token = user?.token;
-
-    if (!token) {
+    if (!user?.token) {
       logout();
       return;
     }
@@ -123,56 +114,26 @@ function EditProfile({ currentUser }: EditProfileProps) {
     try {
       setIsSaving(true);
 
-      const userInfoResponse = await fetch(`${apiBaseUrl}/user/${currentUser.id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
+      const updateData = {
+        birthDay: formState.birthDay || '',
+        birthMonth: formState.birthMonth || '',
+        hometown: formState.hometown || '',
+        occupation: formState.occupation || '',
+        visibility: {
+          birthday: !formState.privateInfo.birthday,
+          hometown: !formState.privateInfo.hometown,
+          occupation: !formState.privateInfo.occupation,
         },
-        body: JSON.stringify({
-          birthDay: formState.birthDay || '',
-          birthMonth: formState.birthMonth || '',
-          hometown: formState.hometown || '',
-          occupation: formState.occupation || '',
-          visibility: {
-            birthday: !formState.privateInfo.birthday,
-            hometown: !formState.privateInfo.hometown,
-            occupation: !formState.privateInfo.occupation,
-          },
-        }),
-      });
+      };
 
-      if (!userInfoResponse.ok) {
-        console.error('Failed to update user information', userInfoResponse);
-      }
+      await updateUserInfo(currentUser.id, user.token, updateData);
 
       if (formState.displayPicture instanceof File) {
-        const token = user?.token;
-  
-        if (!token) {
-          logout();
-          return;
-        }
-
-        const displayPictureFormData = new FormData();
-        displayPictureFormData.append('file', formState.displayPicture);
-  
-        const displayPictureResponse = await fetch(`${apiBaseUrl}/display-pictures/upload`, {
-          method: 'POST',
-          body: displayPictureFormData,
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        if (!displayPictureResponse.ok) {
-          console.error('Failed to upload display picture', displayPictureResponse);
-          throw new Error('Failed to upload display picture');
-        }
+        await uploadDisplayPicture(formState.displayPicture, user.token);
       }
-  
+
       setChangesSaved(true);
-      setUnsaved(false);  
+      setUnsaved(false);
     } catch (error) {
       console.error('Error updating user information:', error);
     } finally {

@@ -8,7 +8,10 @@ import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { CommentData, Like, PostProps } from '../../types/types';
 import { Link } from 'react-router-dom';
-import { formatDate, fetchDisplayPicture } from '../../helpers/helpers';
+import { formatDate } from '../../helpers/helpers';
+import { fetchDisplayPicture } from '../../services/displayPictureService';
+import { likePost, unlikePost, deletePost } from '../../services/postService';
+import { addCommentToPost } from '../../services/commentService';
 import './Post.css';
 import { apiBaseUrl } from '../../config';
 
@@ -43,101 +46,66 @@ function Post({ id, content, author, recipient, date, likes, comments, update }:
     setShowCommentInput(!showCommentInput);
   };
 
-  const handleLikeClick = async () => {
-    try {
-      const token = user?.token;
-  
-      if (!token) { 
-        logout();
-        return;
-      }
-  
-      const endpoint = isLiked ? `${apiBaseUrl}/posts/${id}/unlike` : `${apiBaseUrl}/posts/${id}/like`;
-      const method = isLiked ? 'DELETE' : 'POST';
+ const handleLikeClick = async () => {
+    if (!user?.token) {
+      logout();
+      return;
+    }
 
-      const response = await fetch(endpoint, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          user: { id: user?.id },
-        }),
-      });
-  
-      if (!response.ok) {
-        console.error('Error liking post:', response.statusText);
-        return;
+    try {
+      if (isLiked) {
+        await unlikePost(id, user.id, user.token);
+        setLikesCount(likesCount - 1);
+      } else {
+        await likePost(id, user.id, user.token);
+        setLikesCount(likesCount + 1);
       }
-      update();
       setIsLiked(!isLiked);
-      setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
+      update();
     } catch (error) {
-      console.error('Error liking post:', error);
+      if (error instanceof Error) {
+        console.error('Error liking/unliking post:', error.message);
+      } else {
+        console.error('Unknown error liking/unliking post');
+      }
     }
   };
 
   const handleDeleteClick = async () => {
+    if (!user?.token) {
+      logout();
+      return;
+    }
+
     try {
-      const token = user?.token;
-
-      if (!token) {
-        logout();
-        return;
-      }
-
-      const response = await fetch(`${apiBaseUrl}/posts/${id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        }
-      });
-
-      if (response.ok) {
-        update();
-      } else {
-        console.error('Error deleting post:', response.statusText);
-      }
+      await deletePost(id, user.token);
+      update();
     } catch (error) {
-      console.error('Error deleting post:', error);
+      if (error instanceof Error) {
+        console.error('Error deleting post:', error.message);
+      } else {
+        console.error('Unknown error deleting post');
+      }
     }
   };
 
   const handleCommentSubmit = async () => {
-    if (newComment) {
-      try {
-        const token = user?.token;
-  
-        if (!token) {
-          logout();
-          return;
-        }
-  
-        const response = await fetch(`${apiBaseUrl}/comments/post/${id}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ 
-            content: newComment, 
-            user: {
-              id: user?.id
-            } }),
-        });
-  
-        if (!response.ok) {
-          console.error('Error adding comment:', response.statusText);
-          return;
-        } else {
-          update();
-        }
-  
-        const newCommentData = await response.json();
-        setNewComment('');
-      } catch (error) {
-        console.error('Error adding comment:', error);
+    if (!newComment) return;
+
+    if (!user?.token || !user.id) {
+      logout();
+      return;
+    }
+
+    try {
+      await addCommentToPost(id, newComment, user.id, user.token);
+      setNewComment('');
+      update();
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error adding comment:', error.message);
+      } else {
+        console.error('Unknown error adding comment');
       }
     }
   };

@@ -4,6 +4,7 @@ import Post from '../Post/Post';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { CommentData, PostData, Like } from '../../types/types';
+import { fetchPosts, createPost } from '../../services/postService';
 import './Home.css';
 import { apiBaseUrl } from '../../config';
 
@@ -14,82 +15,48 @@ function Home() {
   const [newPost, setNewPost] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
 
-  const fetchPosts = async () => {
-    try {
-      const token = user?.token;
-      
-      if (!token) {
-        logout();
-        return;
-      }
-
-      const response = await fetch(`${apiBaseUrl}/posts/all`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (response.status === 401) {
+  const loadPosts = async () => {
+    if (!user?.token) {
       logout();
       return;
     }
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      console.error('Server error:', errorData.error);
-      return;
-    }
-
-    const data = await response.json();
-    setLoading(false);
-
-    if (data.error) {
-      console.error('Error from server:', data.error);
-      return;
-    }
-
-    setPosts(data);
+    try {
+      const postsData = await fetchPosts(user.token);
+      setPosts(postsData);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      if (error instanceof Error && error.message === 'Unauthorized') {
+        logout();
+      } else {
+        console.error('Error fetching posts:', error instanceof Error ? error.message : error);
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchPosts();
+    loadPosts();
   }, [user]);
 
 
   const handlePostSubmit = async (postContent: string) => {
-    if (postContent) {
-      try {
-        const token = user?.token;
-        
-        if (!token) {
-          logout();
-          return;
-        }
-        const response = await fetch(`${apiBaseUrl}/posts`, {
-          method: 'POST',
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ 
-            content: postContent, 
-            userId: user.id
-          }),
-        });
+    if (!postContent) return;
 
-        if (response.ok) {
-          const newPost = await response.json();
-          setNewPost('');
-          fetchPosts();
-        } else {
-          console.error('Error adding post:', response.statusText);
-        }
-      } catch (error) {
-        console.error('Error adding post:', error);
+    if (!user?.token) {
+      logout();
+      return;
+    }
+
+    try {
+      await createPost(user.token, postContent, user.id);
+      setNewPost('');
+      loadPosts();
+    } catch (error) {
+      if (error instanceof Error && error.message === 'Unauthorized') {
+        logout();
+      } else {
+        console.error('Error adding post:', error instanceof Error ? error.message : error);
       }
     }
   };

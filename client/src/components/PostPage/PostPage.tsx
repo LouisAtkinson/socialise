@@ -4,6 +4,7 @@ import Post from '../Post/Post';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { PostProps } from '../../types/types';
+import { fetchPostById } from '../../services/postService';
 import './PostPage.css';
 import { apiBaseUrl } from '../../config';
 
@@ -16,29 +17,28 @@ function PostPage() {
 
   useEffect(() => {
     const fetchPost = async () => {
-      try {
-        const token = user?.token;
+      if (!user?.token) {
+        logout();
+        return;
+      }
 
-        if (!token) {
-          logout();
+      try {
+        const numericId = Number(id);
+
+        if (isNaN(numericId)) {
+          console.error('Invalid post ID');
           return;
         }
-
-        const response = await fetch(`${apiBaseUrl}/posts/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error('Error fetching post');
-        }
-
-        const data = await response.json();
+        
+        const data = await fetchPostById(numericId, user.token);
         setPost(data);
-        setLoading(false);
       } catch (error) {
-        console.error('Error fetching post:', error);
+        if (error instanceof Error) {
+          console.error('Error fetching post:', error.message);
+        } else {
+          console.error('Unknown error fetching post');
+        }
+      } finally {
         setLoading(false);
       }
     };

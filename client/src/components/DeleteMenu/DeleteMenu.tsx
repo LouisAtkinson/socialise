@@ -7,7 +7,7 @@ interface DeleteMenuProps {
 
 const DeleteMenu: React.FC<DeleteMenuProps> = ({ deleteFunction }) => {
   const [menuOpen, setMenuOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement | null>(null); // Updated ref to match the new parent container
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   const toggleMenu = () => {
     setMenuOpen((prev) => !prev);

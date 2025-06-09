@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
+import { registerUser } from '../../services/userService';
 import './Register.css';
 import { apiBaseUrl } from '../../config';
 
@@ -13,7 +14,7 @@ function Register() {
   });
 
   const { firstName, lastName, email, password } = formData;
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { dispatch } = useAuthContext();
 
@@ -32,31 +33,23 @@ function Register() {
     setError(null);
 
     try {
-      const response = await fetch(`${apiBaseUrl}/user/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
+      const user = await registerUser(formData);
 
-      const json = await response.json();
-       
-      if (response.ok) {
-        setLoading(false);
-        localStorage.setItem('user', JSON.stringify(json));
-        dispatch({type: 'LOGIN', payload: json});
-        console.log(json);
-        window.location.href = '/';
-      } else {
-        setLoading(false);
-        setError(json.error);
-        console.error(error);
-      }
+      localStorage.setItem('user', JSON.stringify(user));
+      dispatch({ type: 'LOGIN', payload: user });
+      console.log('Registration successful:', user);
+
+      window.location.href = '/'; // Optionally use useNavigate here
     } catch (error) {
-      console.error('Error during registration:', error);
+      if (error instanceof Error) {
+        setError(error.message);
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
+    } finally {
+      setLoading(false);
     }
-  };
+  }
 
   return (
     <div className="register-container">

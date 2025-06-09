@@ -1,22 +1,23 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
+import { loginUser } from '../../services/userService';
 import './Login.css';
 import { apiBaseUrl } from '../../config';
 
 function Login() {
-  const [formData, setFormData] = useState({
-    email: 'JohnFoobar-DEMO@gmail.com',
-    password: 'Johnfoobar1!',
-  });
-
   // const [formData, setFormData] = useState({
-  //   email: "a@a.com",
-  //   password: "Password1!"
+  //   email: 'JohnFoobar-DEMO@gmail.com',
+  //   password: 'Johnfoobar1!',
   // });
 
+  const [formData, setFormData] = useState({
+    email: "a@a.com",
+    password: "Password1!"
+  });
+
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = React.useState<string | null>(null);
   const { dispatch } = useAuthContext();
 
   const { email, password } = formData;
@@ -33,37 +34,24 @@ function Login() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-  
+
     try {
-      console.log("Before fetch:", formData);
-  
-      const response = await fetch(`${apiBaseUrl}/user/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-  
-      console.log("After fetch:", response);
-  
-      const json = await response.json();
-  
-      if (response.ok) {
-        setLoading(false);
-        localStorage.setItem('user', JSON.stringify(json));
-        dispatch({type: 'LOGIN', payload: json});
-        console.log(json);
-        window.location.href = '/';
-      } else {
-        setLoading(false);
-        setError(json.error);
-        console.error(error);
-      }
+      const userData = await loginUser(formData);
+      setLoading(false);
+      localStorage.setItem('user', JSON.stringify(userData));
+      dispatch({ type: 'LOGIN', payload: userData });
+      console.log(userData);
+      window.location.href = '/';
     } catch (error) {
-      console.error('Error during login:', error);
+      setLoading(false);
+      if (error instanceof Error) {
+        setError(error.message);
+        console.error('Login error:', error.message);
+      } else {
+        console.error('Login error:', error);
+      }
     }
-  };
+  }
 
   return (
     <div className='login-page'>

@@ -4,6 +4,7 @@ import UserCard from '../UserCard/UserCard';
 import { UserCardProps } from '../../types/types';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
+import { fetchFriends } from '../../services/friendService';
 import './FriendPage.css';
 import { apiBaseUrl } from '../../config';
 
@@ -16,32 +17,22 @@ function FriendPage() {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const token = user?.token;
+    const fetchFriendsHandler = async () => {
+      if (!user?.token || !id) {
+        if (!user?.token) logout();
+        return;
+      }
 
-        if (!token) {
-          logout();
-          return;
-        }
-        
-        const response = await fetch(`${apiBaseUrl}/friends/all/${id}`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-        });
-        if (!response.ok) {
-          throw new Error('Error fetching friends');
-        }
+      try {
+        const friendsData = await fetchFriends(id, user.token);
+        setFriends(friendsData);
         setLoading(false);
-        const data = await response.json();
-        setFriends(data);
       } catch (error) {
         console.error('Error fetching friends:', error);
       }
     };
 
-    fetchFriends();
+    fetchFriendsHandler();
   }, [id]);
 
   const handleReturnToProfile = () => {

@@ -17,8 +17,6 @@ const SearchBar: React.FC<SearchBarProps> = ({ initialQuery = '', closeMobileNav
     navigate(`/search?query=${searchTerm}`);
   };
 
-
-
   return (
     <form onSubmit={handleSearchSubmit} className="search-bar">
       <div className="search-container">

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { FriendButtonProps } from '../../types/types';
+import { checkFriendshipStatus, sendFriendRequest, acceptFriendRequest, denyFriendRequest, removeFriend } from '../../services/friendService';
 import './FriendButton.css';
 import { apiBaseUrl } from '../../config';
 
@@ -17,155 +18,92 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId, friendshipStatus, s
   };
 
   useEffect(() => {
-    const checkFriendshipStatus = async () => {
+    const checkFriendshipStatusHandler = async () => {
       try {
-        const token = user?.token;
-
-        if (!token) {
+        if (!user?.token || !user?.id || !userId) {
           logout();
           return;
         }
 
-        const response = await fetch(`${apiBaseUrl}/friends/status/${user?.id}/${userId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const data = await checkFriendshipStatus(user.id, userId, user.token);
 
-        if (response.ok) {
-          const data = await response.json();
-          setFriendshipStatus(
-            data.areFriends 
-              ? 'friends' 
+        setFriendshipStatus(
+          data.areFriends 
+            ? 'friends' 
             : data.hasPendingRequestFromLoggedInUser 
               ? 'pending' 
-            : data.hasPendingRequestFromOtherUser
-              ? 'received'
-            : 'notFriends');
-          setFriendshipId(data.friendshipId || null);
-          setLoading(false);        
-          } else {
-          console.error('Error checking friendship status:', response.statusText);
-        }
+              : data.hasPendingRequestFromOtherUser
+                ? 'received'
+                : 'notFriends'
+        );
+
+        setFriendshipId(data.friendshipId || null);
+        setLoading(false);
       } catch (error) {
-        console.error('Error checking friendship status:', error);
+        console.error(error);
       }
     };
 
-    checkFriendshipStatus();
+    checkFriendshipStatusHandler();
   }, [userId]);
 
   const handleAddFriend = async () => {
     try {
-      const token = user?.token;
-
-      if (!token) {
+      if (!user?.token || !userId) {
         logout();
         return;
       }
 
-      const response = await fetch(`${apiBaseUrl}/friends/request/${userId}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        console.log('Friend request sent successfully');
-        setFriendshipStatus('pending');
-      } else {
-        console.error('Error sending friend request:', response.statusText);
-      }
+      await sendFriendRequest(userId, user.token);
+      console.log('Friend request sent successfully');
+      setFriendshipStatus('pending');
     } catch (error) {
-      console.error('Error sending friend request:', error);
+      console.error(error);
     }
   };
 
   const handleAcceptFriendRequest = async () => {
-    if (!friendshipId) return;
-    
+    if (!friendshipId || !user?.token) {
+      if (!user?.token) logout();
+      return;
+    }
+
     try {
-      const token = user?.token;
-
-      if (!token) {
-        logout();
-        return;
-      }
-
-      const response = await fetch(`${apiBaseUrl}/friends/accept/${friendshipId}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        console.log('Friend request accepted successfully');
-        setFriendshipStatus('friends');
-      } else {
-        console.error('Error accepting friend request:', response.statusText);
-      }
+      await acceptFriendRequest(friendshipId, user.token);
+      console.log('Friend request accepted successfully');
+      setFriendshipStatus('friends');
     } catch (error) {
-      console.error('Error accepting friend request:', error);
+      console.error(error);
     }
   };
 
   const handleDenyFriendRequest = async () => {
-    if (!friendshipId) return;
+    if (!friendshipId || !user?.token) {
+      if (!user?.token) logout();
+      return;
+    }
 
     try {
-      const token = user?.token;
-
-      if (!token) {
-        logout();
-        return;
-      }
-
-      const response = await fetch(`${apiBaseUrl}/friends/reject/${friendshipId}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        console.log('Friend request denied successfully');
-        setFriendshipStatus(null);
-      } else {
-        console.error('Error denying friend request:', response.statusText);
-      }
+      await denyFriendRequest(friendshipId, user.token);
+      console.log('Friend request denied successfully');
+      setFriendshipStatus(null);
     } catch (error) {
-      console.error('Error denying friend request:', error);
+      console.error(error);
     }
   };
 
   const handleRemoveFriend = async () => {
-    if (!friendshipId) return;
+    if (!friendshipId || !user?.token) {
+      if (!user?.token) logout();
+      return;
+    }
 
     try {
-      const token = user?.token;
-
-      if (!token) {
-        logout();
-        return;
-      }
-
-      const response = await fetch(`${apiBaseUrl}/friends/delete/${friendshipId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        console.log('Friend removed successfully');
-        setFriendshipStatus('notFriends');
-      } else {
-        console.error('Error removing friend:', response.statusText);
-      }
+      await removeFriend(friendshipId, user.token);
+      console.log('Friend removed successfully');
+      setFriendshipStatus('notFriends');
     } catch (error) {
-      console.error('Error removing friend:', error);
+      console.error(error);
     }
   };
 

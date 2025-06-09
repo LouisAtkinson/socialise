@@ -6,7 +6,8 @@ import LikesSection from '../LikeSection/LikeSection';
 import { CommentData, Like, DisplayPictureOwner } from '../../types/types';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
-import { fetchDisplayPicture } from '../../helpers/helpers';
+import { fetchDisplayPicture, fetchDisplayPictureDetails, toggleLikeDisplayPicture } from '../../services/displayPictureService';
+import { addCommentToDisplayPicture } from '../../services/commentService';
 import LikeButton from '../LikeButton/LikeButton';
 import './DisplayPicture.css';
 import { apiBaseUrl } from '../../config';
@@ -33,7 +34,7 @@ function DisplayPicture() {
   }, [likes, user]);  
 
   const fetchDisplayPictureData = async () => {
-    const token = user?.token; 
+    const token = user?.token;
 
     if (!token) {
       logout();
@@ -41,31 +42,21 @@ function DisplayPicture() {
     }
 
     try {
+      // Fetch display picture
       const displayPicture = await fetchDisplayPicture(userId, 'full', token);
       setDisplayPicture(displayPicture);
+
+      // Fetch additional display picture details
+      const displayPictureData = await fetchDisplayPictureDetails(userId, token);
+
+      setComments(displayPictureData.comments);
+      setLikes(displayPictureData.likes);
+      setUploadDate(displayPictureData.uploadDate);
+      setDisplayPictureId(displayPictureData.id);
+      setIsLoading(false);
+      setOwner(displayPictureData.user);
     } catch (error) {
-      console.error('Error fetching display picture:', error);
-    }
-    try {
-      const response = await fetch(`${apiBaseUrl}/display-pictures/user/${userId}/details`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      if (response.ok) {
-        const displayPictureData = await response.json();
-        setComments(displayPictureData.comments);
-        setLikes(displayPictureData.likes);
-        setUploadDate(displayPictureData.uploadDate);
-        setDisplayPictureId(displayPictureData.id);
-        setIsLoading(false);
-        setOwner(displayPictureData.user);
-      } else {
-        console.error('Error fetching display picture details:', response.statusText);
-      }
-    } catch (error) {
-      console.error('Error fetching display picture details:', error);
+      console.error('Error fetching display picture data:', error);
     }
   };
 
@@ -83,30 +74,12 @@ function DisplayPicture() {
         return;
       }
 
-      const endpoint = isLiked
-        ? `${apiBaseUrl}/display-pictures/${displayPictureId}/unlike`
-        : `${apiBaseUrl}/display-pictures/${displayPictureId}/like`;
-
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          user: { id: user.id },
-        }),
-      });
-
-      if (!response.ok) {
-        console.error('Error liking display picture:', response.statusText);
-        return;
-      }
+      await toggleLikeDisplayPicture(displayPictureId, isLiked, user.id, token);
 
       fetchDisplayPictureData();
       setIsLiked(!isLiked);
     } catch (error) {
-      console.error('Error liking display picture:', error);
+      console.error('Error liking/unliking display picture:', error);
     }
   };
 
@@ -120,21 +93,12 @@ function DisplayPicture() {
           return;
         }
 
-        const response = await fetch(`${apiBaseUrl}/comments/display-picture/${displayPictureId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            content: comment
-          }),
-        });
-
-        if (!response.ok) {
-          console.error('Error adding comment:', response.statusText);
+        if (!displayPictureId) {
+          console.error('No displayPictureId available for adding comment.');
           return;
         }
+
+        await addCommentToDisplayPicture(displayPictureId, comment, user.id, token);
 
         fetchDisplayPictureData();
         setComment('');

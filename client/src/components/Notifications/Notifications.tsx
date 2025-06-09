@@ -5,7 +5,8 @@ import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import blankImage from '../../images/blank.png';
 import NotificationCard from '../NotificationCard/NotificationCard';
-import { fetchDisplayPicture } from '../../helpers/helpers';
+import { fetchDisplayPicture } from '../../services/displayPictureService';
+import { fetchNotifications, deleteNotification, markNotificationAsRead, markAllNotificationsAsRead, clearAllNotifications } from '../../services/notificationService';
 import bellSvg from '../../images/bell.svg';
 import './Notifications.css';
 import { apiBaseUrl } from '../../config';
@@ -32,159 +33,118 @@ const NotificationPopup: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const fetchNotifications = async () => {
+    const loadNotifications = async () => {
+      if (!user?.token) {
+        logout();
+        return;
+      }
+
+      setIsLoading(true);
+
       try {
-        const token = user?.token;
+        const notificationsData = await fetchNotifications(user.token, user.id);
+        setNotifications(notificationsData);
 
-        if (!token) {
-          logout();
-          return;
-        }
-
-        const response = await fetch(`${apiBaseUrl}/notifications/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setNotifications(data);
-          
-          const unread = data.filter((notification: NotificationType) => !notification.isRead);
-          setUnreadCount(unread.length);
-        } else {
-          console.error('Error fetching notifications:', response.statusText);
-        }
+        const unread = notificationsData.filter((notification: NotificationType) => !notification.isRead);
+        setUnreadCount(unread.length);
       } catch (error) {
-        console.error('Error fetching notifications:', error);
+        if (error instanceof Error) {
+          console.error('Error fetching notifications:', error.message);
+        } else {
+          console.error('Unknown error fetching notifications');
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchNotifications();
+    loadNotifications();
   }, []);
 
-  const deleteNotification = async (notificationId: number) => {
+  const handleDeleteNotification = async (notificationId: number) => {
+    if (!user?.token) {
+      logout();
+      return;
+    }
+
     try {
-      const token = user?.token;
-
-      if (!token) {
-        logout();
-        return;
-      }
-
-      const response = await fetch(`${apiBaseUrl}/notifications/${notificationId}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        setNotifications((prevNotifications) =>
-          prevNotifications?.filter((notification: NotificationType) =>
-            notification.id !== notificationId
-          )
-        );
-        setUnreadCount((count) => Math.max(0, count - 1));
-      } else {
-        console.error('Error deleting notification:', response.statusText);
-      }
+      await deleteNotification(user.token, notificationId);
+      setNotifications(prev =>
+        prev?.filter(notification => notification.id !== notificationId)
+      );
+      setUnreadCount(count => Math.max(0, count - 1));
     } catch (error) {
-      console.error('Error deleting notification:', error);
+      if (error instanceof Error) {
+        console.error('Error deleting notification:', error.message);
+      } else {
+        console.error('Unknown error deleting notification');
+      }
     }
   };
 
-  const markAsRead = async (notificationId: number) => {
+  const handleMarkAsRead = async (notificationId: number) => {
+    if (!user?.token) {
+      logout();
+      return;
+    }
+
     try {
-      const token = user?.token;
-
-      if (!token) {
-        logout();
-        return;
-      }
-
-      const response = await fetch(`${apiBaseUrl}/notifications/mark-as-read/${notificationId}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.ok) {
-        setNotifications((prevNotifications) =>
-          prevNotifications?.map((notification: NotificationType) =>
-            notification.id === notificationId
-              ? { ...notification, isRead: true }
-              : notification
-          )
-        );
-        setUnreadCount((count) => Math.max(0, count - 1));
-      } else {
-        console.error('Error marking notification as read:', response.statusText);
-      }
+      await markNotificationAsRead(user.token, notificationId);
+      setNotifications(prevNotifications =>
+        prevNotifications?.map(notification =>
+          notification.id === notificationId ? { ...notification, isRead: true } : notification
+        )
+      );
+      setUnreadCount(count => Math.max(0, count - 1));
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      if (error instanceof Error) {
+        console.error('Error marking notification as read:', error.message);
+      } else {
+        console.error('Unknown error marking notification as read');
+      }
     }
   };
 
-  const markAllAsRead = async () => {
+  const handleMarkAllAsRead = async () => {
+    if (!user?.token) {
+      logout();
+      return;
+    }
+
     try {
-      const token = user?.token;
-  
-      if (!token) {
-        logout();
-        return;
-      }
-  
-      const response = await fetch(`${apiBaseUrl}/notifications/mark-all-as-read/${user.id}`, {
-        method: 'PUT',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-      if (response.ok) {
-        setNotifications((prevNotifications) =>
-          prevNotifications?.map((notification: NotificationType) => ({
-            ...notification,
-            isRead: true,
-          }))
-        );
-        setUnreadCount(0);
-      } else {
-        console.error('Error marking all notifications as read:', response.statusText);
-      }
-      
+      await markAllNotificationsAsRead(user.token, user.id);
+      setNotifications(prevNotifications =>
+        prevNotifications?.map(notification => ({
+          ...notification,
+          isRead: true,
+        }))
+      );
       setUnreadCount(0);
     } catch (error) {
-      console.error('Error marking all notifications as read:', error);
+      if (error instanceof Error) {
+        console.error('Error marking all notifications as read:', error.message);
+      } else {
+        console.error('Unknown error marking all notifications as read');
+      }
     }
   };
   
-  const clearAll = async () => {
+  const handleClearAll = async () => {
+    if (!user?.token) {
+      logout();
+      return;
+    }
+
     try {
-      const token = user?.token;
-  
-      if (!token) {
-        logout();
-        return;
-      }
-  
-      const response = await fetch(`${apiBaseUrl}/notifications/all/${user.id}`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-  
-      if (response.ok) {
-        setNotifications([]);
-        setUnreadCount(0);
-      } else {
-        console.error('Error clearing all notifications:', response.statusText);
-      }
+      await clearAllNotifications(user.token, user.id);
+      setNotifications([]);
+      setUnreadCount(0);
     } catch (error) {
-      console.error('Error clearing all notifications:', error);
+      if (error instanceof Error) {
+        console.error('Error clearing all notifications:', error.message);
+      } else {
+        console.error('Unknown error clearing all notifications');
+      }
     }
   };
   
@@ -224,10 +184,10 @@ const NotificationPopup: React.FC = () => {
             <p className='notifications-loading'>Loading...</p>
           ) : notifications?.length ?? 0 > 0 ? (
             <div className="notification-buttons">
-              <button className="mark-all-read text-transition" onClick={markAllAsRead}>
+              <button className="mark-all-read text-transition" onClick={handleMarkAllAsRead}>
                 Mark all as read
               </button>
-              <button className="clear-all text-transition" onClick={clearAll}>
+              <button className="clear-all text-transition" onClick={handleClearAll}>
                 Clear all
               </button>
             </div>
@@ -239,8 +199,8 @@ const NotificationPopup: React.FC = () => {
               <NotificationCard
                 key={notification.id}
                 notification={notification}
-                markAsRead={markAsRead}
-                deleteNotification={deleteNotification}
+                markAsRead={handleMarkAsRead}
+                deleteNotification={handleDeleteNotification}
               />
             ))}
           </ul>
