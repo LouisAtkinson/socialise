@@ -8,8 +8,6 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.53",
-    "@types/react": "^18.2.22",
-    "@types/react-dom": "^18.2.7",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.16.0",
@@ -41,5 +39,9 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://socialise-seven.vercel.app"
+  "proxy": "http://localhost:5116/api",
+  "devDependencies": {
+    "@types/react": "^18.3.21",
+    "@types/react-dom": "^18.3.7"
+  }
 }
