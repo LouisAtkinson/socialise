@@ -54,3 +54,7 @@
   font-weight: 300;
   margin: 0px;
 }
+
+.selected-file-name {
+  margin-top: 10px;
+}

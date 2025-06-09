@@ -2,6 +2,7 @@
   --primary-color: #232323;
   --secondary-color: #454545;
   --success-color: #28a745;
+  --success-color-dark: #22993e;
   --default-btn: linear-gradient(to right, #4568DC 0%, #B06AB3  51%, #4568DC  100%);
   /* --default-btn: linear-gradient(to right, #fc466b, #3f5efb); */
   --delete-btn: #dc3545;
@@ -297,4 +298,9 @@ a:not(.header a):hover {
 
 .delete-hover:hover {
   background-color: var(--delete-btn-hover);
+}
+
+.error {
+  margin-top: 10px;
+  text-align: center;
 }
