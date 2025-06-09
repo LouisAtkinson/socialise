@@ -6,15 +6,15 @@ import './Login.css';
 import { apiBaseUrl } from '../../config';
 
 function Login() {
-  // const [formData, setFormData] = useState({
-  //   email: 'JohnFoobar-DEMO@gmail.com',
-  //   password: 'Johnfoobar1!',
-  // });
-
   const [formData, setFormData] = useState({
-    email: "a@a.com",
-    password: "Password1!"
+    email: 'JohnFoobar-DEMO@gmail.com',
+    password: 'Johnfoobar1!',
   });
+
+  // const [formData, setFormData] = useState({
+  //   email: "a@a.com",
+  //   password: "Password1!"
+  // });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = React.useState<string | null>(null);
