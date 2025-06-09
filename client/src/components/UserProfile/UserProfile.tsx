@@ -10,6 +10,7 @@ import { PostProps, CommentData, UserProfileProps, Like } from '../../types/type
 import { fetchDisplayPicture } from '../../helpers/helpers';
 import UserFriend from '../UserFriend/UserFriend';
 import './UserProfile.css';
+import { apiBaseUrl } from '../../config';
 
 function UserProfile() {
   const { user } = useAuthContext();
@@ -51,8 +52,8 @@ function UserProfile() {
       }
 
       const postEndpoint = isCurrentUserProfile()
-        ? 'https://socialise-seven.vercel.app/api/posts'
-        : `https://socialise-seven.vercel.app/api/posts/${userProfile.id}`; 
+        ? `${apiBaseUrl}/posts`
+        : `${apiBaseUrl}/posts/friend/${userProfile.id}`; 
 
       const response = await fetch(postEndpoint, {
         method: 'POST',
@@ -79,7 +80,7 @@ function UserProfile() {
     }
   };
 
-  const handleDeletePost = async (postId: string) => {
+  const handleDeletePost = async (postId: number) => {
     try {
       const token = user?.token;
   
@@ -88,7 +89,7 @@ function UserProfile() {
         return;
       }
   
-      const response = await fetch(`https://socialise-seven.vercel.app/api/posts/${postId}`, {
+      const response = await fetch(`${apiBaseUrl}/posts/${postId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -106,27 +107,35 @@ function UserProfile() {
         fetchUserPosts();
       }
       
-      setUserPosts(userPosts.filter((post) => post._id !== postId));
+      setUserPosts(userPosts.filter((post) => post.id !== postId));
     } catch (error) {
       console.error('Error deleting post:', error);
     }
   };
 
   useEffect(() => {
+    if (!user?.token || !id) return;
+  
     Promise.all([
-      fetch(`https://socialise-seven.vercel.app/api/user/${id}`).then((response) => response.json()),
-      fetch(`https://socialise-seven.vercel.app/api/display-pictures/user/${id}`).then((response) => response.blob())
+      fetch(`${apiBaseUrl}/user/${id}`, {
+        headers: {
+          Authorization: `Bearer ${user.token}`,
+        },
+      }).then(res => {
+        if (!res.ok) throw new Error('Failed to fetch user profile');
+        return res.json();
+      }),
+      fetchDisplayPicture(id, 'thumbnail', user.token),  
     ])
-    .then(([userData, displayPictureBlob]) => {
-      if (displayPictureBlob instanceof Blob && !displayPictureBlob.type.startsWith('application/')) {
-        setUserProfile({ ...userData, displayPicture: URL.createObjectURL(displayPictureBlob) });
-      } else {
-        console.error('Invalid display picture data:', displayPictureBlob);
-        setUserProfile({ ...userData });
-      }
-    })
-    .catch((error) => console.error('Error fetching user data:', error));
-  }, [id]);
+      .then(([userData, displayPicture]) => {
+        setUserProfile({ ...userData, displayPicture });
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching user data or display picture:', error);
+        setLoading(false);
+      });
+  }, [id, user?.token]);
 
   const fetchUserPosts = async () => {
     try {
@@ -138,7 +147,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/posts/user/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/posts/user/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -164,7 +173,7 @@ function UserProfile() {
 
   useEffect(() => {
     fetchUserPosts();
-  }, [id, user]);
+  }, [id, user, friendshipStatus]);
   
 
   const isCurrentUserProfile = () => {
@@ -182,7 +191,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/status/${user?.id}/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/friends/status/${user?.id}/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -200,7 +209,7 @@ function UserProfile() {
   };
 
   useEffect(() => {
-    checkFriendshipStatus();
+    if (!isCurrentUserProfile()) checkFriendshipStatus();
   }, [id]);
 
   const handleAddFriend = async () => {
@@ -212,7 +221,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/add/${user?.id}/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/friends/add/${user?.id}/${id}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -239,7 +248,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/accept/${user?.id}/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/friends/accept/${user?.id}/${id}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -266,7 +275,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/deny/${user?.id}/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/friends/deny/${user?.id}/${id}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -293,7 +302,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/remove/${user?.id}/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/friends/remove/${user?.id}/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -320,7 +329,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/all/${id}`, {
+      const response = await fetch(`${apiBaseUrl}/friends/all/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -341,12 +350,17 @@ function UserProfile() {
     fetchFriendsList();
   }, [id]);
 
+  const canInteractWithProfile = () => {
+    return isCurrentUserProfile() || friendshipStatus === 'friends';
+  };
+
   const hasUserInfo = () => {
-    return (userProfile.visibility.birthday && userProfile.birthDay && userProfile.birthMonth ||
-        userProfile.visibility.hometown && userProfile.hometown ||
-        userProfile.visibility.occupation && userProfile.occupation
-      )
-  }
+    return (
+      (userProfile.visibility.birthday && userProfile.birthDay && userProfile.birthMonth) ||
+      (userProfile.visibility.hometown && userProfile.hometown) ||
+      (userProfile.visibility.occupation && userProfile.occupation)
+    );
+  };
 
   if (loading) {
     return <h3>Loading...</h3>;
@@ -357,9 +371,13 @@ function UserProfile() {
       <div className="profile-top">
         <div className="profile-picture">
           {userProfile.displayPicture ? (
-            <Link to={`/user/${userProfile.id}/display-picture`} state={{ user }}>
+            canInteractWithProfile() ? (
+              <Link to={`/user/${userProfile.id}/display-picture`} state={{ user }}>
+                <img src={userProfile.displayPicture} alt={`${userProfile.firstName}'s display picture`} />
+              </Link>
+            ) : (
               <img src={userProfile.displayPicture} alt={`${userProfile.firstName}'s display picture`} />
-            </Link>
+            )
           ) : (
             <img src={blankImage} alt={`Default blank profile picture`} />
           )}
@@ -367,9 +385,15 @@ function UserProfile() {
 
         <h2>{`${userProfile.firstName} ${userProfile.lastName}`}</h2>
 
-        {!isCurrentUserProfile && <FriendButton userId={userProfile.id} />}
+        {!isCurrentUserProfile() && (
+          <FriendButton 
+            userId={userProfile.id} 
+            friendshipStatus={friendshipStatus} 
+            setFriendshipStatus={setFriendshipStatus} 
+          />
+        )}
 
-        {hasUserInfo() && 
+        {canInteractWithProfile() && hasUserInfo() && 
           <div className='user-info'>
             {userProfile.visibility.birthday && userProfile.birthDay && userProfile.birthMonth && (
               <p>Birthday: {`${userProfile.birthMonth} ${userProfile.birthDay}`}</p>
@@ -397,15 +421,17 @@ function UserProfile() {
           {friendsList.length === 0 ? (
             <p>No friends added yet.</p>
           ) : (
-            friendsList.slice(0, 2).map((friend: { _id: string; firstName: string; lastName: string; }) => (             
-              <UserFriend key={friend._id} friend={friend} />
+            friendsList.slice(0, 2).map((friend: { id: string; firstName: string; lastName: string; }) => (             
+              <UserFriend key={friend.id} friend={friend} />
             ))
           )}
         </div>
-        <Link to="friends" className="see-all-link">See All Friends</Link>
+        {friendsList.length > 0 && (
+          <Link to="friends" className="see-all-link">See All Friends</Link>
+        )}
       </div>
 
-      <div className="post-section">
+      {canInteractWithProfile() && <div className="post-section">
         <h3>Posts</h3>
         <PostForm onSubmit={handlePostFormSubmit} />
         {userPosts.length === 0 ? (
@@ -413,13 +439,13 @@ function UserProfile() {
         ) : (
           userPosts.map((post) => (
             <Post
-              key={post._id}
+              key={post.id}
               {...post}
               update={fetchUserPosts}
             />
           ))
         )}
-      </div>
+      </div>}
     </div>
   );
 }

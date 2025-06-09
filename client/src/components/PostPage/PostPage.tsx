@@ -5,6 +5,7 @@ import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { PostProps } from '../../types/types';
 import './PostPage.css';
+import { apiBaseUrl } from '../../config';
 
 function PostPage() {
   const { id } = useParams<{ id: string }>();
@@ -23,7 +24,7 @@ function PostPage() {
           return;
         }
 
-        const response = await fetch(`https://socialise-seven.vercel.app/api/posts/post/${id}`, {
+        const response = await fetch(`${apiBaseUrl}/posts/${id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

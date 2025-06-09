@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import './Register.css';
+import { apiBaseUrl } from '../../config';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -31,7 +32,7 @@ function Register() {
     setError(null);
 
     try {
-      const response = await fetch('https://socialise-seven.vercel.app/api/user/register', {
+      const response = await fetch(`${apiBaseUrl}/user/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -10,8 +10,9 @@ import { CommentData, Like, PostProps } from '../../types/types';
 import { Link } from 'react-router-dom';
 import { formatDate, fetchDisplayPicture } from '../../helpers/helpers';
 import './Post.css';
+import { apiBaseUrl } from '../../config';
 
-function Post({ _id, content, author, recipient, date, likes, comments, update }: PostProps) {  
+function Post({ id, content, author, recipient, date, likes, comments, update }: PostProps) {  
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -25,17 +26,18 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
   const [likesCount, setLikesCount] = useState<number>(likes.length);
 
   useEffect(() => {
-    setIsLiked(likes.some(like => like._id === user?.id));
+    setIsLiked(likes.some(like => like.id === user?.id));
   }, [likes, user]);
 
   useEffect(() => {
     const getProfilePicture = async () => {
-      const authorPicture = await fetchDisplayPicture(author._id);
+      const token = user?.token;
+      const authorPicture = await fetchDisplayPicture(author.id, 'thumbnail', token);
       setAuthorProfilePicture(authorPicture);
     };
 
     getProfilePicture();
-  }, [author._id, recipient]);
+  }, [author.id, recipient]);
 
   const handleCommentButtonClick = () => {
     setShowCommentInput(!showCommentInput);
@@ -45,12 +47,12 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
     try {
       const token = user?.token;
   
-      if (!token) {
+      if (!token) { 
         logout();
         return;
       }
   
-      const endpoint = isLiked ? `https://socialise-seven.vercel.app/api/posts/${_id}/unlike` : `https://socialise-seven.vercel.app/api/posts/${_id}/like`;
+      const endpoint = isLiked ? `${apiBaseUrl}/posts/${id}/unlike` : `${apiBaseUrl}/posts/${id}/like`;
       const method = isLiked ? 'DELETE' : 'POST';
 
       const response = await fetch(endpoint, {
@@ -85,7 +87,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/posts/${_id}`, {
+      const response = await fetch(`${apiBaseUrl}/posts/${id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -112,7 +114,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
           return;
         }
   
-        const response = await fetch(`https://socialise-seven.vercel.app/api/posts/${_id}/comments`, {
+        const response = await fetch(`${apiBaseUrl}/comments/post/${id}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -144,7 +146,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
     <div className="post-container">
       <div className="post">
       <div className="post-header">
-        <Link to={`/user/${author._id}`}>
+        <Link to={`/user/${author.id}`}>
           <img
             src={authorProfilePicture ? authorProfilePicture : blankImage}
             alt={`${author.firstName}'s display picture`}
@@ -153,13 +155,13 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
         <div className="post-info">
           <div className='post-name-date'>
             <div className="post-names-container">
-              <Link to={`/user/${author._id}`}>
+              <Link to={`/user/${author.id}`}>
                 <p className="post-author text-transition">{`${author.firstName} ${author.lastName}`}</p>
               </Link>
               {recipient && (
                 <>
                   <span className="recipient-arrow">{' > '}</span>
-                  <Link to={`/user/${recipient._id}`}>
+                  <Link to={`/user/${recipient.id}`}>
                     <p className="post-recipient text-transition">{`${recipient.firstName} ${recipient.lastName}`}</p>
                   </Link>
                 </>
@@ -170,7 +172,7 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
             </div>
           </div>
         </div>
-        {author._id === user?.id || (recipient && recipient._id === user?.id) ? (
+        {author.id === user?.id || (recipient && recipient.id === user?.id) ? (
           <DeleteMenu deleteFunction={handleDeleteClick} />
         ) : null}
       </div>
@@ -208,15 +210,15 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
             {firstComment && (
               <div className="first-comment">
                 <Comment
-                  key={firstComment._id}
-                  _id={firstComment._id}
-                  authorId={firstComment.author._id}
+                  key={firstComment.id}
+                  id={firstComment.id}
+                  authorId={firstComment.author.id}
                   displayPicture={authorProfilePicture}
                   fullName={`${firstComment.author.firstName} ${firstComment.author.lastName}`}
                   datetime={firstComment.date}
                   content={firstComment.content}
                   likes={firstComment.likes}
-                  parentId={_id}
+                  parentId={id}
                   update={update}
                   type="post"
                 />
@@ -225,15 +227,15 @@ function Post({ _id, content, author, recipient, date, likes, comments, update }
 
             {showComments && remainingComments?.map((comment) => (
               <Comment
-                key={comment._id}
-                _id={comment._id}
-                authorId={comment.author._id}
+                key={comment.id}
+                id={comment.id}
+                authorId={comment.author.id}
                 displayPicture={comment.author.displayPicture}
                 fullName={`${comment.author.firstName} ${comment.author.lastName}`}
                 datetime={comment.date}
                 content={comment.content}
                 likes={comment.likes}
-                parentId={_id}
+                parentId={id}
                 update={update}
                 type="post"
               />

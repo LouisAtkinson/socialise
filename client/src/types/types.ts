@@ -1,13 +1,13 @@
 export interface PostData {
-    _id: string;
+    id: number;
     content: string;
     recipient: {
-        _id: string;
+        id: string;
         firstName: string;
         lastName: string;
     } | null;
     author: {
-      _id: string;
+      id: string;
       displayPicture: string | null;
       firstName: string;
       lastName: string;
@@ -15,18 +15,18 @@ export interface PostData {
     date: string;
     likes: Like[];
     comments: CommentData[];
-  }
+}
 
 export interface PostProps {
-    _id: string;
+    id: number;
     content: string;
     recipient: {
-        _id: string;
+        id: string;
         firstName: string;
         lastName: string;
     } | null;
     author: {
-      _id: string;
+      id: string;
       displayPicture: string | null;
       firstName: string;
       lastName: string;
@@ -38,9 +38,9 @@ export interface PostProps {
 }
 
 export interface CommentData {
-    _id: string;
+    id: number;
     author: {
-        _id: string;
+        id: string;
         displayPicture: string | null;
         firstName: string;
         lastName: string;
@@ -51,20 +51,20 @@ export interface CommentData {
 }
 
 export interface CommentProps {
-    _id: string,
+    id: number,
     authorId: string,
     displayPicture: string | null;
     fullName: string;
     datetime: string;
     content: string;
-    parentId: string;
+    parentId: number;
     likes: Like[];
     update: Function;
     type: string;
 }
   
 export interface Like {
-    _id: string;
+    id: string;
     firstName: string;
     lastName: string;
     displayPicture: string | null;
@@ -95,7 +95,7 @@ export interface UserProfileProps {
 
 export interface UserFriendProps {
     friend: {
-      _id: string;
+      id: string;
       firstName: string;
       lastName: string;
     };
@@ -108,10 +108,12 @@ export interface SearchBarProps {
 
 export interface FriendButtonProps {
     userId: string;
+    friendshipStatus: string | null;
+    setFriendshipStatus: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
 export interface UserCardProps {
-    _id: string;
+    id: string;
     firstName: string;
     lastName: string;
     hometown: string | null;
@@ -164,18 +166,18 @@ export interface PostFormProps {
 }  
 
 export interface NotificationType {
-    _id: string;
+    id: number;
     sender: {
-      _id: string;
+      id: string;
       firstName: string;
       lastName: string;
       displayPicture: string | null;
     };
     type: string;
     isRead: boolean;
-    postId: string;
-    commentId: string;
-    displayPictureId: string;
+    postId: number;
+    commentId: number;
+    displayPictureId: number | null;
 }
 
 export interface LikesSectionProps {
@@ -189,8 +191,8 @@ export interface LikesPopupProps {
 
 export interface NotificationCardProps {
     notification: NotificationType;
-    markAsRead: (notificationId: string) => void;
-    deleteNotification: (notificationId: string) => void;
+    markAsRead: (notificationId: number) => void;
+    deleteNotification: (notificationId: number) => void;
 }
 
 export interface MobileNavProps {

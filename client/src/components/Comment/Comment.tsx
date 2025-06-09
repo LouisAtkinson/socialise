@@ -8,9 +8,10 @@ import { Link } from 'react-router-dom';
 import LikesSection from '../LikeSection/LikeSection';
 import DeleteMenu from '../DeleteMenu/DeleteMenu';
 import LikeButton from '../LikeButton/LikeButton';
+import { apiBaseUrl } from '../../config';
 import './Comment.css';
 
-function Comment({ _id, authorId, displayPicture, fullName, datetime, content, likes, parentId, update, type }: CommentProps) {
+function Comment({ id, authorId, displayPicture, fullName, datetime, content, likes, parentId, update, type }: CommentProps) {
   const { user } = useAuthContext();
   const { logout } = useLogout();
   const [isLiked, setIsLiked] = React.useState<boolean>(false);
@@ -19,7 +20,8 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
 
   React.useEffect(() => {
     const getProfilePicture = async () => {
-      const picture = await fetchDisplayPicture(authorId);
+      const token = user?.token;
+      const picture = await fetchDisplayPicture(authorId, 'thumbnail', token);
       setAuthorProfilePicture(picture);
     };
 
@@ -27,7 +29,7 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
   }, [authorId]);
 
   React.useEffect(() => {
-    setIsLiked(likes.some(like => like._id === user?.id));
+    setIsLiked(likes.some(like => like.id === user?.id));
   }, [likes, user]);
 
   const handleLikeClick = async () => {
@@ -42,8 +44,8 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
       const commentType = (type === 'post') ? 'posts' : 'display-pictures';
   
       const endpoint = isLiked 
-        ? `https://socialise-seven.vercel.app/api/${commentType}/${parentId}/comments/${_id}/unlike` 
-        : `https://socialise-seven.vercel.app/api/${commentType}/${parentId}/comments/${_id}/like`;
+        ? `${apiBaseUrl}/comments/${id}/unlike` 
+        : `${apiBaseUrl}/comments/${id}/like`;
       const method = isLiked ? 'DELETE' : 'POST';
 
       const response = await fetch(endpoint, {
@@ -71,9 +73,7 @@ function Comment({ _id, authorId, displayPicture, fullName, datetime, content, l
   
   const handleDeleteClick = async () => {
     try {
-      const endpoint = (type === 'post')
-        ? `https://socialise-seven.vercel.app/api/posts/${parentId}/comments/${_id}`
-        : `https://socialise-seven.vercel.app/api/display-pictures/${parentId}/comments/${_id}` 
+      const endpoint = `${apiBaseUrl}/comments/${id}`
 
       const token = user?.token;
 

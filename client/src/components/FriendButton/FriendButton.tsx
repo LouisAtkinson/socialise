@@ -3,11 +3,12 @@ import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { FriendButtonProps } from '../../types/types';
 import './FriendButton.css';
+import { apiBaseUrl } from '../../config';
 
-const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
+const FriendButton: React.FC<FriendButtonProps> = ({ userId, friendshipStatus, setFriendshipStatus }) => {
   const { user } = useAuthContext();
   const { logout } = useLogout();
-  const [friendshipStatus, setFriendshipStatus] = useState<string | null>(null);
+  const [friendshipId, setFriendshipId] = useState<number | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
@@ -25,7 +26,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
           return;
         }
 
-        const response = await fetch(`https://socialise-seven.vercel.app/api/friends/status/${user?.id}/${userId}`, {
+        const response = await fetch(`${apiBaseUrl}/friends/status/${user?.id}/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -41,6 +42,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
             : data.hasPendingRequestFromOtherUser
               ? 'received'
             : 'notFriends');
+          setFriendshipId(data.friendshipId || null);
           setLoading(false);        
           } else {
           console.error('Error checking friendship status:', response.statusText);
@@ -62,7 +64,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/add/${user?.id}/${userId}`, {
+      const response = await fetch(`${apiBaseUrl}/friends/request/${userId}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -81,6 +83,8 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
   };
 
   const handleAcceptFriendRequest = async () => {
+    if (!friendshipId) return;
+    
     try {
       const token = user?.token;
 
@@ -89,7 +93,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/accept/${user?.id}/${userId}`, {
+      const response = await fetch(`${apiBaseUrl}/friends/accept/${friendshipId}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -108,6 +112,8 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
   };
 
   const handleDenyFriendRequest = async () => {
+    if (!friendshipId) return;
+
     try {
       const token = user?.token;
 
@@ -116,7 +122,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/deny/${user?.id}/${userId}`, {
+      const response = await fetch(`${apiBaseUrl}/friends/reject/${friendshipId}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -135,6 +141,8 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
   };
 
   const handleRemoveFriend = async () => {
+    if (!friendshipId) return;
+
     try {
       const token = user?.token;
 
@@ -143,7 +151,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/friends/remove/${user?.id}/${userId}`, {
+      const response = await fetch(`${apiBaseUrl}/friends/delete/${friendshipId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -152,7 +160,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
 
       if (response.ok) {
         console.log('Friend removed successfully');
-        setFriendshipStatus(null);
+        setFriendshipStatus('notFriends');
       } else {
         console.error('Error removing friend:', response.statusText);
       }
@@ -174,9 +182,9 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId }) => {
           )}
           {friendshipStatus === 'pending' && <p className='pending-friends'>Friend request pending</p>}
           {friendshipStatus === 'received' && (
-            <div>
-              <button onClick={handleAcceptFriendRequest}>Accept friend request</button>
-              <button onClick={handleDenyFriendRequest}>Deny friend request</button>
+            <div className='accept-reject-btns'>
+              <button className='accept-button' onClick={handleAcceptFriendRequest}>Accept friend request</button>
+              <button className='reject-button' onClick={handleDenyFriendRequest}>Reject friend request</button>
             </div>
           )}
           {friendshipStatus === 'sent' && <p className='pending-friends'>Friend request sent</p>}

@@ -5,6 +5,7 @@ import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { CommentData, PostData, Like } from '../../types/types';
 import './Home.css';
+import { apiBaseUrl } from '../../config';
 
 function Home() {
   const { user } = useAuthContext();
@@ -22,7 +23,7 @@ function Home() {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/posts/${user.id}`, {
+      const response = await fetch(`${apiBaseUrl}/posts/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -68,7 +69,7 @@ function Home() {
           logout();
           return;
         }
-        const response = await fetch('https://socialise-seven.vercel.app/api/posts', {
+        const response = await fetch(`${apiBaseUrl}/posts`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -105,7 +106,7 @@ function Home() {
           ) : (
             posts.map((post) => (
               <Post
-                key={post._id}
+                key={post.id}
                 {...post}
                 update={fetchPosts}
               />

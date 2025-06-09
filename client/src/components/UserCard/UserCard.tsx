@@ -5,32 +5,63 @@ import { useAuthContext } from '../../hooks/useAuthContext';
 import FriendButton from '../FriendButton/FriendButton';
 import { UserCardProps } from '../../types/types';
 import { fetchDisplayPicture } from '../../helpers/helpers';
+import { useLogout } from '../../hooks/useLogout';
+import { apiBaseUrl } from '../../config';
 import './UserCard.css';
 
 const UserCard: React.FC<UserCardProps> = ({
-  _id,
+  id,
   firstName,
   lastName,
   hometown,
   visibility,
 }) => {
   const { user } = useAuthContext();
-  const isCurrentUser = user?.id === _id;
+  const { logout } = useLogout();
+  const isCurrentUser = user?.id === id;
   const [userDisplayPicture, setUserDisplayPicture] = React.useState<string | null>(null);
+  const [friendshipStatus, setFriendshipStatus] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     const getProfilePicture = async () => {
-      const picture = await fetchDisplayPicture(_id);
+      const token = user?.token;
+      const picture = await fetchDisplayPicture(id, 'thumbnail', token);
       setUserDisplayPicture(picture);
     };
 
     getProfilePicture();
-  }, [_id]);
+  }, [id]);
+
+  const checkFriendshipStatus = async () => {
+      try {
+        const token = user?.token;
+  
+        if (!token) {
+          logout();
+          return;
+        }
+  
+        const response = await fetch(`${apiBaseUrl}/friends/status/${user?.id}/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        if (response.ok) {
+          const data = await response.json();
+          setFriendshipStatus(data.status);
+        } else {
+          console.error('Error checking friendship status:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Error checking friendship status:', error);
+      }
+    };
 
   return (
     <div className='user-card'>
       <div className='user-card-left'>
-        <Link to={`/user/${_id}`}>
+        <Link to={`/user/${id}`}>
           <div className="user-card-display-picture">
             <img src={userDisplayPicture ? userDisplayPicture : blankImage} alt="User's display picture" />
           </div>
@@ -38,7 +69,7 @@ const UserCard: React.FC<UserCardProps> = ({
         <div className="user-card-details">
           <div>
             <h3 className='user-card-name'>
-              <Link to={`/user/${_id}`} className='user-link'>
+              <Link to={`/user/${id}`} className='user-link'>
                 {`${firstName} ${lastName}`}
               </Link>
               {isCurrentUser && <span className='you-text'>(you)</span>}
@@ -50,8 +81,12 @@ const UserCard: React.FC<UserCardProps> = ({
       </div>
       <div className='user-name-right'>
         <div className="user-card-friendship-actions">
-              <FriendButton userId={_id} />
-            </div>
+              <FriendButton 
+                userId={id} 
+                friendshipStatus={friendshipStatus} 
+                setFriendshipStatus={setFriendshipStatus} 
+              />
+          </div>
       </div>
       
     </div>

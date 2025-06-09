@@ -5,6 +5,7 @@ import { UserCardProps } from '../../types/types';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import './FriendPage.css';
+import { apiBaseUrl } from '../../config';
 
 function FriendPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,7 +25,7 @@ function FriendPage() {
           return;
         }
         
-        const response = await fetch(`https://socialise-seven.vercel.app/api/friends/all/${id}`, {
+        const response = await fetch(`${apiBaseUrl}/friends/all/${id}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -57,7 +58,7 @@ function FriendPage() {
         ) : (
           <div className="friend-list">
             {friends.map((friend) => (
-              <UserCard key={friend._id} {...friend} />
+              <UserCard key={friend.id} {...friend} />
             ))}
           </div>
         )

@@ -8,6 +8,7 @@ import NotificationCard from '../NotificationCard/NotificationCard';
 import { fetchDisplayPicture } from '../../helpers/helpers';
 import bellSvg from '../../images/bell.svg';
 import './Notifications.css';
+import { apiBaseUrl } from '../../config';
 
 const NotificationPopup: React.FC = () => {
   const { user } = useAuthContext();
@@ -40,7 +41,7 @@ const NotificationPopup: React.FC = () => {
           return;
         }
 
-        const response = await fetch(`https://socialise-seven.vercel.app/api/user/${user.id}/notifications`, {
+        const response = await fetch(`${apiBaseUrl}/notifications/${user.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -64,7 +65,7 @@ const NotificationPopup: React.FC = () => {
     fetchNotifications();
   }, []);
 
-  const deleteNotification = async (notificationId: string) => {
+  const deleteNotification = async (notificationId: number) => {
     try {
       const token = user?.token;
 
@@ -73,7 +74,7 @@ const NotificationPopup: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/notifications/${notificationId}`, {
+      const response = await fetch(`${apiBaseUrl}/notifications/${notificationId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -82,7 +83,7 @@ const NotificationPopup: React.FC = () => {
       if (response.ok) {
         setNotifications((prevNotifications) =>
           prevNotifications?.filter((notification: NotificationType) =>
-            notification._id !== notificationId
+            notification.id !== notificationId
           )
         );
         setUnreadCount((count) => Math.max(0, count - 1));
@@ -94,7 +95,7 @@ const NotificationPopup: React.FC = () => {
     }
   };
 
-  const markAsRead = async (notificationId: string) => {
+  const markAsRead = async (notificationId: number) => {
     try {
       const token = user?.token;
 
@@ -103,7 +104,7 @@ const NotificationPopup: React.FC = () => {
         return;
       }
 
-      const response = await fetch(`https://socialise-seven.vercel.app/api/notifications/${notificationId}/markAsRead`, {
+      const response = await fetch(`${apiBaseUrl}/notifications/mark-as-read/${notificationId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -112,7 +113,7 @@ const NotificationPopup: React.FC = () => {
       if (response.ok) {
         setNotifications((prevNotifications) =>
           prevNotifications?.map((notification: NotificationType) =>
-            notification._id === notificationId
+            notification.id === notificationId
               ? { ...notification, isRead: true }
               : notification
           )
@@ -135,7 +136,7 @@ const NotificationPopup: React.FC = () => {
         return;
       }
   
-      const response = await fetch(`https://socialise-seven.vercel.app/api/user/${user.id}/notifications/markAllAsRead`, {
+      const response = await fetch(`${apiBaseUrl}/notifications/mark-all-as-read/${user.id}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -151,7 +152,7 @@ const NotificationPopup: React.FC = () => {
         );
         setUnreadCount(0);
       } else {
-        console.error('Error deleting all notifications:', response.statusText);
+        console.error('Error marking all notifications as read:', response.statusText);
       }
       
       setUnreadCount(0);
@@ -169,7 +170,7 @@ const NotificationPopup: React.FC = () => {
         return;
       }
   
-      const response = await fetch(`https://socialise-seven.vercel.app/api/user/${user.id}/notifications`, {
+      const response = await fetch(`${apiBaseUrl}/notifications/all/${user.id}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -236,7 +237,7 @@ const NotificationPopup: React.FC = () => {
           <ul>
             {notifications?.map((notification: NotificationType) => (
               <NotificationCard
-                key={notification._id}
+                key={notification.id}
                 notification={notification}
                 markAsRead={markAsRead}
                 deleteNotification={deleteNotification}

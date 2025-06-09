@@ -9,6 +9,7 @@ import { useLogout } from '../../hooks/useLogout';
 import { fetchDisplayPicture } from '../../helpers/helpers';
 import LikeButton from '../LikeButton/LikeButton';
 import './DisplayPicture.css';
+import { apiBaseUrl } from '../../config';
 
 function DisplayPicture() {
   const { user } = useAuthContext();
@@ -19,7 +20,7 @@ function DisplayPicture() {
   const [comments, setComments] = useState<CommentData[]>([]);
   const [likes, setLikes] = useState<Like[]>([]);
   const [uploadDate, setUploadDate] = useState<Date | null>(null);
-  const [displayPictureId, setDisplayPictureId] = useState<string>('');
+  const [displayPictureId, setDisplayPictureId] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<Boolean>(true);
   const [owner, setOwner] = useState<DisplayPictureOwner | null>(null);
   const [commentInputVisible, setCommentInputVisible] = useState<Boolean>(false);
@@ -28,24 +29,36 @@ function DisplayPicture() {
   const navigate = useNavigate();
 
   React.useEffect(() => {
-    setIsLiked(likes.some(like => like._id === user?.id));
+    setIsLiked(likes.some(like => like.id === user?.id));
   }, [likes, user]);  
 
   const fetchDisplayPictureData = async () => {
+    const token = user?.token; 
+
+    if (!token) {
+      logout();
+      return;
+    }
+
     try {
-      const displayPicture = await fetchDisplayPicture(userId);
+      const displayPicture = await fetchDisplayPicture(userId, 'full', token);
       setDisplayPicture(displayPicture);
     } catch (error) {
       console.error('Error fetching display picture:', error);
     }
     try {
-      const response = await fetch(`https://socialise-seven.vercel.app/api/display-pictures/user/${userId}/details`);
+      const response = await fetch(`${apiBaseUrl}/display-pictures/user/${userId}/details`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
       if (response.ok) {
         const displayPictureData = await response.json();
         setComments(displayPictureData.comments);
         setLikes(displayPictureData.likes);
         setUploadDate(displayPictureData.uploadDate);
-        setDisplayPictureId(displayPictureData.displayPictureId);
+        setDisplayPictureId(displayPictureData.id);
         setIsLoading(false);
         setOwner(displayPictureData.user);
       } else {
@@ -65,14 +78,17 @@ function DisplayPicture() {
         return;
       }
 
-      const endpoint = isLiked
-        ? `https://socialise-seven.vercel.app/api/display-pictures/${userId}/unlike`
-        : `https://socialise-seven.vercel.app/api/display-pictures/${userId}/like`;
+      if (!displayPictureId) {
+        console.error('No displayPictureId available for liking/unliking.');
+        return;
+      }
 
-      const method = isLiked ? 'DELETE' : 'POST';
+      const endpoint = isLiked
+        ? `${apiBaseUrl}/display-pictures/${displayPictureId}/unlike`
+        : `${apiBaseUrl}/display-pictures/${displayPictureId}/like`;
 
       const response = await fetch(endpoint, {
-        method: method,
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -104,17 +120,14 @@ function DisplayPicture() {
           return;
         }
 
-        const response = await fetch(`https://socialise-seven.vercel.app/api/display-pictures/${userId}/comments`, {
+        const response = await fetch(`${apiBaseUrl}/comments/display-picture/${displayPictureId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            content: comment,
-            user: {
-              id: user.id,
-            },
+            content: comment
           }),
         });
 
@@ -189,9 +202,9 @@ function DisplayPicture() {
             <div className='comment-section comments-container'>
               {comments.map((comment) => (
                 <Comment
-                  key={comment._id}
-                  _id={comment._id}
-                  authorId={comment.author._id}
+                  key={comment.id}
+                  id={comment.id}
+                  authorId={comment.author.id}
                   displayPicture={comment.author.displayPicture}
                   fullName={`${comment.author.firstName} ${comment.author.lastName}`}
                   datetime={comment.date}

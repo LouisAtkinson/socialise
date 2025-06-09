@@ -13,7 +13,8 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, markA
   useEffect(() => {
     const fetchProfilePicture = async () => {
       try {
-        const picture = await fetchDisplayPicture(notification.sender._id);
+        const token = user?.token;
+        const picture = await fetchDisplayPicture(notification.sender.id, 'thumbnail', token);
         setDisplayPicture(picture);
       } catch (error) {
         console.error('Error fetching display picture:', error);
@@ -21,17 +22,17 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, markA
     };
 
     fetchProfilePicture();
-  }, [notification.sender._id]);
+  }, [notification.sender.id]);
 
   return (
     <li
-      key={notification._id}
-      onClick={() => markAsRead(notification._id)}
+      key={notification.id}
+      onClick={() => markAsRead(notification.id)}
       className={notification.isRead ? 'notification' : 'notification unread'}
     >
       <div className="notification-container">
         {notification.type === 'friendRequest' && (
-          <Link to={`/user/${notification.sender._id}`}>
+          <Link to={`/user/${notification.sender.id}`}>
             <div className="notification-content">
               <img
                 src={displayPicture || blankImage}
@@ -49,7 +50,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, markA
         )}
 
         {notification.type === 'friendRequestAccepted' && (
-          <Link to={`/user/${notification.sender._id}`}>
+          <Link to={`/user/${notification.sender.id}`}>
             <div className="notification-content">
               <img
                 src={displayPicture || blankImage}
@@ -157,7 +158,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, markA
         )}
 
         {notification.type === 'displayPictureCommentLike' && (
-          <Link to={`/user/${notification.sender._id}/display-picture`}>
+          <Link to={`/user/${notification.sender.id}/display-picture`}>
             <div className="notification-content">
               <img
                 src={displayPicture || blankImage}
@@ -194,7 +195,7 @@ const NotificationCard: React.FC<NotificationCardProps> = ({ notification, markA
 
         <button
           className="delete-notification-btn delete-hover"
-          onClick={() => deleteNotification(notification._id)}
+          onClick={() => deleteNotification(notification.id)}
         >
           Delete
         </button>

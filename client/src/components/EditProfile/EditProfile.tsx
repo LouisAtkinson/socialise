@@ -7,6 +7,7 @@ import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { fetchDisplayPicture } from '../../helpers/helpers';
 import './EditProfile.css';
+import { apiBaseUrl } from '../../config';
 
 function EditProfile({ currentUser }: EditProfileProps) {
   const [formState, setFormState] = useState<FormState>({
@@ -14,11 +15,11 @@ function EditProfile({ currentUser }: EditProfileProps) {
     birthMonth: currentUser.birthMonth || '',
     hometown: currentUser.hometown || '',
     occupation: currentUser.occupation || '',
-    displayPicture: currentUser.displayPicture || '',
+    displayPicture: currentUser.displayPicture || null,
     privateInfo: {
-      birthday: !currentUser.visibility?.birthday || true,
-      hometown: !currentUser.visibility?.hometown || true,
-      occupation: !currentUser.visibility?.occupation || true,
+      birthday: !currentUser.visibility?.birthday,
+      hometown: !currentUser.visibility?.hometown,
+      occupation: !currentUser.visibility?.occupation,
     },
   });
 
@@ -34,23 +35,28 @@ function EditProfile({ currentUser }: EditProfileProps) {
 
   React.useEffect(() => {
     const fetchUserData = async () => {
+      if (!currentUser?.id || !user?.token) return;
       try {
-        const response = await fetch(`https://socialise-seven.vercel.app/api/user/${currentUser.id}`);
+        const response = await fetch(`${apiBaseUrl}/user/${currentUser.id}`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
         if (response.ok) {
           const userData = await response.json();
-          
-          const displayPicture = await fetchDisplayPicture(currentUser.id);
+          const token = user?.token;
+          const displayPicture = await fetchDisplayPicture(currentUser.id, 'full', token);
 
           setFormState({
             birthDay: userData.birthDay || '',
             birthMonth: userData.birthMonth || '',
             hometown: userData.hometown || '',
             occupation: userData.occupation || '',
-            displayPicture: displayPicture || '',
+            displayPicture: displayPicture || null,
             privateInfo: {
-              birthday: !userData.visibility?.birthday || true,
-              hometown: !userData.visibility?.hometown || true,
-              occupation: !userData.visibility?.occupation || true,
+              birthday: !userData.visibility?.birthday,
+              hometown: !userData.visibility?.hometown,
+              occupation: !userData.visibility?.occupation,
             },
           });
 
@@ -107,20 +113,32 @@ function EditProfile({ currentUser }: EditProfileProps) {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
+    const token = user?.token;
+
+    if (!token) {
+      logout();
+      return;
+    }
+
     try {
       setIsSaving(true);
 
-      const userInfoResponse = await fetch(`https://socialise-seven.vercel.app/api/user/${currentUser.id}`, {
+      const userInfoResponse = await fetch(`${apiBaseUrl}/user/${currentUser.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           birthDay: formState.birthDay || '',
           birthMonth: formState.birthMonth || '',
           hometown: formState.hometown || '',
           occupation: formState.occupation || '',
-          privateInfo: formState.privateInfo,
+          visibility: {
+            birthday: !formState.privateInfo.birthday,
+            hometown: !formState.privateInfo.hometown,
+            occupation: !formState.privateInfo.occupation,
+          },
         }),
       });
 
@@ -139,7 +157,7 @@ function EditProfile({ currentUser }: EditProfileProps) {
         const displayPictureFormData = new FormData();
         displayPictureFormData.append('file', formState.displayPicture);
   
-        const displayPictureResponse = await fetch(`https://socialise-seven.vercel.app/api/display-pictures/${user.id}`, {
+        const displayPictureResponse = await fetch(`${apiBaseUrl}/display-pictures/upload`, {
           method: 'POST',
           body: displayPictureFormData,
           headers: {

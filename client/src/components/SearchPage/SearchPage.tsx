@@ -3,8 +3,11 @@ import { useLocation } from 'react-router-dom';
 import SearchBar from '../SearchBar/SearchBar';
 import UserCard from '../UserCard/UserCard';
 import './SearchPage.css';
+import { useAuthContext } from '../../hooks/useAuthContext';
+import { apiBaseUrl } from '../../config';
 
 const SearchPage: React.FC = () => {
+  const { user } = useAuthContext();
   const location = useLocation();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [users, setUsers] = useState<any[]>([]);
@@ -21,9 +24,15 @@ const SearchPage: React.FC = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
+      if (!user?.token) return;
+
       try {
         setLoading(true);
-        const response = await fetch(`https://socialise-seven.vercel.app/api/user/search/${searchQuery}`);
+        const response = await fetch(`${apiBaseUrl}/user/search/${searchQuery}`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
         if (response.ok) {
           setLoading(false);
           const data = await response.json();
@@ -56,8 +65,8 @@ const SearchPage: React.FC = () => {
           {users?.length === 0 && (<h4 className='no-users'>No users match search criteria</h4>)}
           {currentUsers.map((user) => (
               <UserCard
-                  key={user._id} 
-                  _id={user._id}
+                  key={user.id} 
+                  id={user.id}
                   firstName={user.firstName}
                   lastName={user.lastName}
                   hometown={user.hometown || null}

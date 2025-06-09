@@ -2,12 +2,18 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../../hooks/useAuthContext';
 import './Login.css';
+import { apiBaseUrl } from '../../config';
 
 function Login() {
   const [formData, setFormData] = useState({
     email: 'JohnFoobar-DEMO@gmail.com',
     password: 'Johnfoobar1!',
   });
+
+  // const [formData, setFormData] = useState({
+  //   email: "a@a.com",
+  //   password: "Password1!"
+  // });
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -31,7 +37,7 @@ function Login() {
     try {
       console.log("Before fetch:", formData);
   
-      const response = await fetch('https://socialise-seven.vercel.app/api/user/login', {
+      const response = await fetch(`${apiBaseUrl}/user/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

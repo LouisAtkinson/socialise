@@ -1,3 +1,5 @@
+import { apiBaseUrl } from "../config";
+
 export const formatDate = (rawDate: string): string => {
     const options: Intl.DateTimeFormatOptions = {
       day: 'numeric',
@@ -11,9 +13,22 @@ export const formatDate = (rawDate: string): string => {
     return formattedDate;
 };
 
-export const fetchDisplayPicture = async (userId: string) => {
+export const fetchDisplayPicture = async (userId: string, type: string, token?: string) => {
   try {
-    const response = await fetch(`https://socialise-seven.vercel.app/api/display-pictures/user/${userId}`);
+    const headers: HeadersInit = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${apiBaseUrl}/display-pictures/user/${userId}/${type}`, {
+      headers,
+    });
+
+    if (response.status === 404) {
+      // user hasn't uploaded a display picture
+      return null;
+    }
+
     if (response.ok) {
       const contentType = response.headers.get('content-type');
       
