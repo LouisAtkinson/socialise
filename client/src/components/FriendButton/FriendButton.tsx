@@ -21,7 +21,7 @@ const FriendButton: React.FC<FriendButtonProps> = ({ userId, friendshipStatus, s
     const checkFriendshipStatusHandler = async () => {
       try {
         if (!user?.token || !user?.id || !userId) {
-          logout();
+          if (!user?.token) logout();
           return;
         }
 

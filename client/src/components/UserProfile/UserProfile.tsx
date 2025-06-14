@@ -128,7 +128,7 @@ function UserProfile() {
       const loggedInUserId = user?.id;
 
       if (!token || !loggedInUserId || !id) {
-        logout();
+        if (!token) logout();
         return;
       }
 
@@ -147,7 +147,7 @@ function UserProfile() {
     try {
       const token = user?.token;
       if (!token || !id) {
-        logout();
+        if (!token) logout();
         return;
       }
 

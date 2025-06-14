@@ -93,7 +93,7 @@ function Post({ id, content, author, recipient, date, likes, comments, update }:
     if (!newComment) return;
 
     if (!user?.token || !user.id) {
-      logout();
+      if (!user?.token) logout();
       return;
     }
 
