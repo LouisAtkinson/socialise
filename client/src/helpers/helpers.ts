@@ -39,7 +39,7 @@ export async function convertHeicToJpeg(file: File): Promise<Blob> {
 
 export async function compressImageFile(file: File): Promise<File> {
   const options = {
-    maxSizeMB: 0.3,       
+    maxSizeMB: 0.8,       
     maxWidthOrHeight: 800,
     useWebWorker: true,
   };
