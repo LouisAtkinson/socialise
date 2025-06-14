@@ -1,5 +1,6 @@
 .home {
-  max-width: 600px;
+  width: 600px;
+  max-width: 90vw;
 }
 
 .home h2 {
