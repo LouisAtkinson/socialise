@@ -1,4 +1,5 @@
 import { apiBaseUrl } from "../config";
+import { compressImageFile } from "../helpers/helpers";
 
 export const fetchDisplayPicture = async (userId: string, type: string, token?: string) => {
   try {
@@ -83,8 +84,10 @@ export const toggleLikeDisplayPicture = async (
 };
 
 export async function uploadDisplayPicture(file: File, token: string) {
+  const compressedFile = await compressImageFile(file);
+
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append('file', compressedFile);
   
   const response = await fetch(`${apiBaseUrl}/display-pictures/upload`, {
     method: 'POST',
