@@ -1,4 +1,5 @@
 import heic2any from 'heic2any';
+import imageCompression from 'browser-image-compression';
 
 export const formatDate = (rawDate: string): string => {
     const options: Intl.DateTimeFormatOptions = {
@@ -32,6 +33,22 @@ export async function convertHeicToJpeg(file: File): Promise<Blob> {
     return result;
   } catch (error) {
     console.error('HEIC conversion failed:', error);
+    return file;
+  }
+}
+
+export async function compressImageFile(file: File): Promise<File> {
+  const options = {
+    maxSizeMB: 0.3,       
+    maxWidthOrHeight: 800,
+    useWebWorker: true,
+  };
+
+  try {
+    const compressedFile = await imageCompression(file, options);
+    return compressedFile;
+  } catch (error) {
+    console.error('Image compression error:', error);
     return file;
   }
 }
