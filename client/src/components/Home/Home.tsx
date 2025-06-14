@@ -75,7 +75,7 @@ function Home() {
               <Post
                 key={post.id}
                 {...post}
-                update={fetchPosts}
+                update={loadPosts}
               />
             ))
           )
