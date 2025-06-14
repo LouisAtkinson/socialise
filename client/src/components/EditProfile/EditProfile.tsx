@@ -7,6 +7,7 @@ import { useAuthContext } from '../../hooks/useAuthContext';
 import { useLogout } from '../../hooks/useLogout';
 import { fetchDisplayPicture, uploadDisplayPicture } from '../../services/displayPictureService';
 import { fetchUserData, updateUserInfo } from '../../services/userService';
+import { convertHeicToJpeg } from '../../helpers/helpers';
 import './EditProfile.css';
 import { apiBaseUrl } from '../../config';
 
@@ -88,17 +89,26 @@ function EditProfile({ currentUser }: EditProfileProps) {
     setUnsaved(true);
   };
 
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
+    if (!file) return;
+  
+    // as heic files don't render in the browser, convert to jpeg if it is one
+    const convertedBlob = await convertHeicToJpeg(file);
 
-    if (file) {
-      setFormState((prevFormState) => ({
-        ...prevFormState,
-        displayPicture: file,
-      }));
-      setSelectedFile(file);
+    let processedFile: File;
+    if (convertedBlob === file) {
+      processedFile = file;
+    } else {
+      processedFile = new File([convertedBlob], file.name.replace(/\.[^/.]+$/, '.jpg'), { type: 'image/jpeg' });
     }
-
+  
+    setFormState(prev => ({
+      ...prev,
+      displayPicture: processedFile,
+    }));
+  
+    setSelectedFile(processedFile);
     setChangesSaved(false);
     setUnsaved(true);
   };
