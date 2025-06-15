@@ -130,7 +130,7 @@ body {
 
 .comments-container textarea, .post-form textarea {
   font-family: inherit;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .show-more-comments-button, .submit-comment-btn {
