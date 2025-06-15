@@ -149,7 +149,7 @@ textarea {
   width: 100%;
   padding: 8px;
   border-radius: 4px;
-  resize: vertical;
+  resize: none;
 }
 
 .comments button {
