@@ -22,6 +22,10 @@
   color: #fff;
 }
 
+html {
+  overscroll-behavior: none;
+}
+
 body {
   font-family: Roboto, Arial, sans-serif;
   background-color: var(--primary-color);
