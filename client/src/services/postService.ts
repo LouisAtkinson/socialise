@@ -82,7 +82,7 @@ export async function createPost(token: string, content: string, userId: string)
   return data;
 }
 
-export async function createPostOnFriendWall(token: string, friendId: string, content: string, userId: string) {
+export async function createPostOnFriendWall(token: string, content: string, friendId: string, userId: string) {
   const response = await fetch(`${apiBaseUrl}/posts/friend/${friendId}`, {
     method: 'POST',
     headers: {
